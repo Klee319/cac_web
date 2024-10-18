@@ -13,7 +13,7 @@ import GalleryPage from "@/components/home/gallery/GalleryPage";
 export default async function Page() {
     return (
         <>
-            <div className="flex justify-center ">
+            <div className="flex justify-center body">
                 <div className="z-20">
                     <div id="welcome">
                         <Welcome></Welcome>

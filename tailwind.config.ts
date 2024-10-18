@@ -10,11 +10,10 @@ const config: Config = {
     extend: {
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
-      inset:{
-        '1/8': '12.5%'
+      inset: {
+        '1/8': '12.5%',
       },
       fontFamily: {
         "hina": "hina",
@@ -29,14 +28,18 @@ const config: Config = {
         "zapfino": "zapfino",
         "Hannari": "Hannari",
         "Verdana": "Verdana",
-
       },
       width: {
         'event': '38rem',
         'event-image': '44rem',
       },
+      // カスタムスクリーン (縦幅対応)
+      screens: {
+        'h-md': { 'raw': '(max-height: 600px)' }, // 縦600px以下に適用
+      },
     },
   },
   plugins: [],
 }
-export default config
+
+export default config;

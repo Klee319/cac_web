@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import Image from "next/image";
 // @ts-ignore
 import cacLogo from '../../../public/logo/newCAC.png';
@@ -7,13 +7,32 @@ import SwitchLightDark from "@/components/main/switchLightDark";
 
 export default function HomeHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false); // メニューの開閉状態
+    const [headerHeight, setHeaderHeight] = useState(95);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // メニューの開閉をトグル
+    // ウィンドウのサイズ変更に対応する
+    useEffect(() => {
+        const handleResize = () => {
+            const headerElement = document.querySelector(".header");
+            if (headerElement) {
+                setHeaderHeight(headerElement.clientHeight); // ヘッダーの高さを取得
+            }
+        };
+
+        // リスナーを追加
+        window.addEventListener("resize", handleResize);
+        handleResize(); // 初期実行
+
+        return () => window.removeEventListener("resize", handleResize); // クリーンアップ
+    }, []);
+    const handleLinkClick = () => {
+        setIsMenuOpen(false); // メニューを閉じる
+    };
 
     return (
         <>
             {/* ヘッダー */}
-            <header className="fixed w-full top-0 left-0 p-8 shadow-md z-50 ">
+            <div className="fixed w-full top-0 left-0 p-8 shadow-md z-50 header h-md:hidden">
                 <div className="flex items-center justify-between">
                     {/* 左側: ロゴとスイッチボタン */}
                     <div className="flex items-center space-x-4">
@@ -24,7 +43,7 @@ export default function HomeHeader() {
                     </div>
 
                     {/* ハンバーガーメニューアイコン (スマホ用) */}
-                    <div className="md:hidden">
+                    <div className="xl:hidden">
                         <button onClick={toggleMenu} aria-label="Open Menu" className="relative z-50">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +59,7 @@ export default function HomeHeader() {
                     </div>
 
                     {/* PC用ナビゲーションリンク */}
-                    <nav className="hidden md:flex space-x-8 text-2xl font-moon">
+                    <nav className="hidden xl:flex space-x-8 text-2xl font-moon">
                         <a href="#welcome" className="hover:text-link-hover-color">Welcome</a>
                         <a href="#about" className="hover:text-link-hover-color">About</a>
                         <a href="#group" className="hover:text-link-hover-color">Group</a>
@@ -49,14 +68,14 @@ export default function HomeHeader() {
                         <a href="#gallery" className="hover:text-link-hover-color">Gallery</a>
                     </nav>
                 </div>
-            </header>
+            </div>
 
             {/* メニュー */}
             <div
-                className={`absolute top-[85px] right-0 w-full shadow-lg z-40 transition-transform duration-300 ease-in-out overflow-hidden menu-bar ${
+                className={`menu-bar h-md:hidden top-[85px] fixed right-0 shadow-lg z-40 transition-transform duration-300 ease-in-out overflow-hidden p-1 ${
                     isMenuOpen ? "translate-y-0" : "-translate-y-full"
                 }`}
-                style={{ width:200 }} // ヘッダーの高さを引いた高さを設定
+                style={{width: "fit-content"}}
             >
                 <nav className="p-4 text-center ">
                     {["Welcome", "About", "Group", "Location & Dates", "Event", "Gallery"].map((item, index) => (
@@ -65,6 +84,7 @@ export default function HomeHeader() {
                             <a
                                 href={`#${item.toLowerCase().replace(/ & /g, "-").replace(/\s+/g, "")}`}
                                 className="block text-lg py-4"
+                                onClick={handleLinkClick}
                             >
                                 {item}
                             </a>

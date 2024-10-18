@@ -7,7 +7,7 @@ metadata = {
     description: "introduction of C.A.C.",
     keywords:
         "C.A.C., 部活, 京産, 創作, 神山祭, 京都産業大学, CAC, サークル, パソコン, 情報理工学部, 情理, イラスト, CG, プログラミング, 音楽, 動画編集, シナリオ",
-    viewport: "width=device-width, initial-scale=1.0",
+    viewport: "width=device-width, initial-scale=1.0, viewport-fit=cover",
     author: "C.A.C.",
 };
 

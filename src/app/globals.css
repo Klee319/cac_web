@@ -16,6 +16,7 @@
   --hover-color: #00afff;
   --hamburger-icon-color: #000000;
   --footer-background-color: #ffffff;
+  --menu-bar-color: #ffffff;
   --x-icon-filter: none;
 }
 
@@ -30,15 +31,21 @@
   --hover-color: #ffcc99;
   --hamburger-icon-color: #ffffff;
   --footer-background-color: #2b2b2b;
+  --menu-bar-color: #282828;
   --x-icon-filter: invert(1);
 }
 
 
-header {
+.header {
   background-color: var(--header-background-color);
 }
 
 body {
+  background-color: var(--header-background-color);
+  color: var(--text-color);
+}
+
+.body {
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -68,7 +75,7 @@ a:hover {
 }
 
 .menu-bar {
-  background-color: var(--header-background-color);
+  background-color: var(--menu-bar-color);
 }
 
 .x-icon {
