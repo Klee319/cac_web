@@ -77,10 +77,10 @@ export default function HomeHeader() {
                 }`}
                 style={{width: "fit-content"}}
             >
-                <nav className="p-4 text-center ">
+                <nav className="p-4 text-center font-moon ">
                     {["Welcome", "About", "Group", "Location & Dates", "Event", "Gallery"].map((item, index) => (
                         <div key={index} className="flex flex-col">
-                            <hr className="border-t border-gray-300" />
+                            <hr className="menu-border" />
                             <a
                                 href={`#${item.toLowerCase().replace(/ & /g, "-").replace(/\s+/g, "")}`}
                                 className="block text-lg py-4"
@@ -88,7 +88,6 @@ export default function HomeHeader() {
                             >
                                 {item}
                             </a>
-                            <hr className="border-t border-gray-300" />
                         </div>
                     ))}
                 </nav>

@@ -18,6 +18,7 @@
   --footer-background-color: #ffffff;
   --menu-bar-color: #ffffff;
   --x-icon-filter: none;
+  --menu-border-color: #505050;
 }
 
 .dark-mode {
@@ -31,7 +32,8 @@
   --hover-color: #ffcc99;
   --hamburger-icon-color: #ffffff;
   --footer-background-color: #2b2b2b;
-  --menu-bar-color: #282828;
+  --menu-bar-color: #232323;
+  --menu-border-color: #888888;
   --x-icon-filter: invert(1);
 }
 
@@ -72,6 +74,10 @@ a:hover {
 
 .text-blue-400 {
   color: var(--blue-color-alt);
+}
+
+.menu-border {
+  border-color: var(--menu-border-color) !important;
 }
 
 .menu-bar {
