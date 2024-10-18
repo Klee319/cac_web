@@ -3,8 +3,8 @@ import Group from '@/components/home/group/group';
 import Location from '@/components/home/location';
 import Event from "@/components/home/event/event";
 import Footer from "@/components/main/footer";
-import Header from '@/components/main/header'
-import Welcome from "@/components/main/Welcome";
+import HomeHeader from '@/components/home/homeHeader'
+import Welcome from "@/components/home/Welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
 
 
@@ -19,7 +19,7 @@ export default async function Page() {
                         <Welcome></Welcome>
                     </div>
                     <div>
-                        <Header></Header>
+                        <HomeHeader></HomeHeader>
                     </div>
                     <div className="h-[128px]">
                     </div>
