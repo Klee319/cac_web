@@ -4,7 +4,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* スマホ以下 */
+@media (max-width: 428px) and (max-device-height: 667px) {
+    /* GoogleアプリまたはSafari以外のブラウザ用 */
+    .google .welcome {
+        height: 650px;
+    }
+
+    .google .welcome-main {
+    }
+
+    .google .cac-cat {
+        width: 200px;
+        height: 200px;
+        transform: translateX(20px);
+        position: relative ; /* レイアウト調整 */
+    }
+
+    .google .welcome-text {
+        position: relative ;
+        margin-top: 350px;
+        text-align: center;
+    }
+
+    .google .cac-logoL {
+        position: relative;
+        margin-top: -120px;
+    }
+
+
+    .safari .welcome-main {
+    }
+    .safari .cac-cat{
+        width: 200px;
+        height: 200px;
+        transform: translateX(30px);
+    }
+    .safari .welcome-text{
+    }
+    .safari .cac-logoL{
+    }
+
+}
+
+
+
 @media (max-width: 428px) {
     /* GoogleアプリまたはSafari以外のブラウザ用 */
     .google .welcome {
@@ -35,9 +78,6 @@
 
 }
 
-
-
-
 /* スマホより大きい（小さめ表示)*/
 @media (min-width: 428px) {
     .welcome-main {
@@ -58,7 +98,6 @@
     }
 
 }
-
 /* タブレットより大きい（大きめ表示） */
 @media (min-width: 768px) {
     .cac-logoL{

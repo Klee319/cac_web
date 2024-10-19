@@ -18,6 +18,9 @@ export default async function Page() {
         if (!isSafari || isGoogleApp) {
             // Safari以外のブラウザ、またはGoogleアプリにクラスを付与
             document.body.classList.add("google");
+        }else {
+            // Safariの場合
+            document.body.classList.add("safari");
         }
 
         const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
