@@ -8,18 +8,17 @@ import HomeHeader from '@/components/home/homeHeader'
 import Welcome from "@/components/home/Welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
 import {useEffect} from "react";
+import Head from "next/head";
 
 
-export default async function Page() {
+export default function Page() {
     useEffect(() => {
         const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        const isGoogleApp = /GSA/i.test(navigator.userAgent); // Googleアプリの判定
+        const isGoogleApp = /GSA/i.test(navigator.userAgent);
 
         if (!isSafari || isGoogleApp) {
-            // Safari以外のブラウザ、またはGoogleアプリにクラスを付与
             document.body.classList.add("google");
-        }else {
-            // Safariの場合
+        } else {
             document.body.classList.add("safari");
         }
 
@@ -27,13 +26,20 @@ export default async function Page() {
 
         if (isTablet) {
             document.body.classList.add('tablet');
-            //アラートを出す
         }
-    }, []);
+    }, []); // 空の依存配列でコンポーネントのマウント時のみ実行
     return (
         <>
+            <Head>
+            <title>C.A.C. Official Website</title>
+            <meta name="description" content="introduction of C.A.C." />
+            <meta name="keywords" content="C.A.C., 京産, サークル" />
+            <meta name="author" content="C.A.C." />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+            </Head>
 
             <div className="body">
+
                 <div className="z-20">
                     <div id="welcome">
                         <Welcome></Welcome>

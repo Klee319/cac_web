@@ -21,9 +21,11 @@ export default function HomeHeader() {
                     {/* 左側: ロゴとスイッチボタン */}
                     <div className="flex">
                         <div className="cac-logo h-auto w-[80px]">
-                            <Image src={cacLogo}
-                                   alt="C.A.C. logo"
-                                   style={{width: 100, height: 'auto'}}
+                            <Image
+                                src="/logo/newCAC.png"
+                                  alt="C.A.C. ロゴ"
+                                  width={460}
+                                  height={192}
                                    className="block"
                             />
                         </div>

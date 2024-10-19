@@ -18,7 +18,7 @@ export default function Footer() {
                 {/* ロゴとタイトル */}
                 <div className="flex items-center space-x-4">
                     <Image
-                        src={"/logo/newCAC.png"}
+                        src="/logo/newCAC.png"
                         alt="C.A.C. logo"
                         width={220}
                         height={100}
