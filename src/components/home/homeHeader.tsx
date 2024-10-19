@@ -10,34 +10,26 @@ export default function HomeHeader() {
     const [headerHeight, setHeaderHeight] = useState(95);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // メニューの開閉をトグル
-    // ウィンドウのサイズ変更に対応する
-    useEffect(() => {
-        const handleResize = () => {
-            const headerElement = document.querySelector(".header");
-            if (headerElement) {
-                setHeaderHeight(headerElement.clientHeight); // ヘッダーの高さを取得
-            }
-        };
-
-        // リスナーを追加
-        window.addEventListener("resize", handleResize);
-        handleResize(); // 初期実行
-
-        return () => window.removeEventListener("resize", handleResize); // クリーンアップ
-    }, []);
     const handleLinkClick = () => {
         setIsMenuOpen(false); // メニューを閉じる
     };
 
     return (
         <>
+
             {/* ヘッダー */}
-            <div className="fixed w-full top-0 left-0 p-8 shadow-md z-50 header h-md:hidden">
+            <div className="fixed w-full top-0 left-0 p-7 shadow-md z-50 header  mobile-landscape:hidden">
                 <div className="flex items-center justify-between">
                     {/* 左側: ロゴとスイッチボタン */}
-                    <div className="flex items-center space-x-4">
-                        <Image src={cacLogo} alt="C.A.C. logo" style={{ width: 100, height: 'auto' }} className="block" />
-                        <div className="text-1xl font-moon">
+                    <div className="flex">
+                        <div className="w-20 h-auto md:w-32">
+                        <Image src={cacLogo}
+                               alt="C.A.C. logo"
+                               style={{ width: 100, height: 'auto' }}
+                               className="block"
+                        />
+                        </div>
+                        <div className="text-[12px] md:text-[16px] font-moon pt-1">
                             <SwitchLightDark />
                         </div>
                     </div>
@@ -72,7 +64,7 @@ export default function HomeHeader() {
 
             {/* メニュー */}
             <div
-                className={`menu-bar h-md:hidden top-[85px] fixed right-0 shadow-lg z-40 transition-transform duration-300 ease-in-out overflow-hidden p-1 ${
+                className={`menu-bar mobile-landscape:hidden top-[75px] fixed right-0 shadow-lg z-40 transition-transform duration-300 ease-in-out overflow-hidden p-1 ${
                     isMenuOpen ? "translate-y-0" : "-translate-y-full"
                 }`}
                 style={{width: "fit-content"}}

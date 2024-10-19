@@ -1,3 +1,4 @@
+"use client";
 import About from '@/components/home/about';
 import Group from '@/components/home/group/group';
 import Location from '@/components/home/location';
@@ -8,12 +9,11 @@ import Welcome from "@/components/home/Welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
 
 
-
-
 export default async function Page() {
     return (
         <>
-            <div className="flex justify-center body">
+
+            <div className="body">
                 <div className="z-20">
                     <div id="welcome">
                         <Welcome></Welcome>
@@ -23,23 +23,23 @@ export default async function Page() {
                     </div>
                     <div className="h-[128px]">
                     </div>
-                    <div id="about" >
-                        <About></About>
-                    </div>
+                    {/*<div id="about" >*/}
+                    {/*    <About></About>*/}
+                    {/*</div>*/}
 
-                    <div id="group">
-                        <Group></Group>
-                    </div>
+                    {/*<div id="group">*/}
+                    {/*    <Group></Group>*/}
+                    {/*</div>*/}
 
-                    <div id="location">
-                        <Location></Location>
-                    </div>
-                    <div id="event">
-                        <Event></Event>
-                    </div>
-                    <div id="gallery">
-                        <GalleryPage></GalleryPage>
-                    </div>
+                    {/*<div id="location">*/}
+                    {/*    <Location></Location>*/}
+                    {/*</div>*/}
+                    {/*<div id="event">*/}
+                    {/*    <Event></Event>*/}
+                    {/*</div>*/}
+                    {/*<div id="gallery">*/}
+                    {/*    <GalleryPage></GalleryPage>*/}
+                    {/*</div>*/}
                     <div>
                         <Footer></Footer>
                     </div>
