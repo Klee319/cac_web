@@ -38,6 +38,7 @@ const config: Config = {
         'mobile-landscape': { 'raw': '(max-height: 600px)' }, // 縦600px以下に適用
         'tablet-portrait': { 'raw': '(min-height: 768px) and (max-width: 1024px)' }, // 縦900px以下に適用
       },
+      display: ['safari', 'chrome'],
     },
   },
   plugins: [],

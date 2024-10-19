@@ -7,9 +7,26 @@ import Footer from "@/components/main/footer";
 import HomeHeader from '@/components/home/homeHeader'
 import Welcome from "@/components/home/Welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
+import {useEffect} from "react";
 
 
 export default async function Page() {
+    useEffect(() => {
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isGoogleApp = /GSA/i.test(navigator.userAgent); // Googleアプリの判定
+
+        if (!isSafari || isGoogleApp) {
+            // Safari以外のブラウザ、またはGoogleアプリにクラスを付与
+            document.body.classList.add("google");
+        }
+
+        const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
+
+        if (isTablet) {
+            document.body.classList.add('tablet');
+            //アラートを出す
+        }
+    }, []);
     return (
         <>
 

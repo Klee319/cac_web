@@ -6,7 +6,6 @@
 @tailwind utilities;
 
 :root {
-  --vh: 100%; /* svhをサポートするブラウザで利用 */
   --foreground-color: #2b2b2b;
   --background-color: #ffffff;
   --header-background-color: #ffffff;
@@ -106,26 +105,65 @@ html {
   scroll-behavior: smooth;
 }
 
-/* スマホ（小さな端末）用の画像フィット */
-@media (max-width: 768px) {
-  .gallery-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+/* スマホ以下 */
+@media (max-width: 428px) {
+.nav-bar {
+  display: none;
+}
+}
+
+
+
+/* スマホより大きい（小さめ表示)*/
+@media (min-width: 428px) {
+  .cac-logo{
+    width: 100px;
+  }
+  .dark-switch{
+    font-size: 16px;
+  }
+  .header{
+    padding: 20px;
   }
 }
 
-/* PC用（大きめ表示で中央揃え） */
-@media (min-width: 769px) {
-  .gallery-image {
-    width: 80%; /* PCでは少し大きめに表示 */
-    height: auto;
-    max-height: 80%; /* 高さ制限を追加 */
-    object-fit: contain;
-    object-position: center;
+/* 大きいタブレットより大きい（大きめ表示） */
+@media (min-width: 1280px) {
+  .nav-bar{
+    display: block !important;
+  }
+
+}
+
+
+/* タブレット用（横向き表示の時） */
+@media (max-width: 960px) and (min-height: 1280px) {
+  .menu-bar{
+    display: none;
+  }
+  .header{
+    display: none;
   }
 }
+
+/* タブレット用（縦向き表示の時） */
+@media (max-width:1280px) and (min-height:960px) {
+
+}
+
+
+/* スマホ（横向き表示の時（高さ不足）) */
+@media (max-height: 500px) {
+  .menu-bar{
+    display: none;
+  }
+  .header{
+    display: none;
+  }
+}
+
+
+
 
 
 
