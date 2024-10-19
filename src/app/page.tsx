@@ -27,16 +27,22 @@ export default function Page() {
         if (isTablet) {
             document.body.classList.add('tablet');
         }
+        // 既存の viewport メタタグを探して削除
+        const existingViewport = document.querySelector('meta[name="viewport"]');
+        if (existingViewport) {
+            existingViewport.remove();
+        }
+
+        // 新しい viewport メタタグを作成
+        const newViewport = document.createElement('meta');
+        newViewport.name = "viewport";
+        newViewport.content = "width=device-width, initial-scale=1.0, viewport-fit=cover";
+        document.head.appendChild(newViewport);
     }, []); // 空の依存配列でコンポーネントのマウント時のみ実行
     return (
         <>
-            <Head>
-            <title>C.A.C. Official Website</title>
-            <meta name="description" content="introduction of C.A.C." />
-            <meta name="keywords" content="C.A.C., 京産, サークル" />
-            <meta name="author" content="C.A.C." />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-            </Head>
+        <body>
+
 
             <div className="body">
 
@@ -73,6 +79,7 @@ export default function Page() {
             </div>
 
 
+        </body>
         </>
     )
 };

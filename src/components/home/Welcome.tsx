@@ -1,10 +1,11 @@
 "use client";
 import Image from "next/image";
 import "./welcome.css";
+import Head from "next/head";
 
 export default function Welcome() {
     return (
-
+        // 画面全体を覆うdiv
         <div className="relative w-full h-screen overflow-hidden welcome " >
             {/* 背景画像 */}
             <div className="absolute inset-0 w-full h-full">
