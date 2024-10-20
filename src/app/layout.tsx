@@ -17,7 +17,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <meta name="author" content="C.A.C." />
             {/* メタデータ */}
         </head>
+        <body>
             {children}
+        </body>
         </html>
     );
 }

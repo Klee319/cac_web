@@ -18,9 +18,19 @@ export default function Page() {
 
         if (!isSafari || isGoogleApp) {
             document.body.classList.add("google");
+            //alert("このサイトはGoogle");
         } else {
             document.body.classList.add("safari");
+            //alert("このサイトはSafari");
         }
+        const setViewportHeight = () => {
+            const vh = window.innerHeight * 0.01;
+            document.body.style.setProperty('--vh', `${vh}px`);
+        };
+
+        setViewportHeight();
+        window.addEventListener("orientationchange", setViewportHeight);
+
 
         const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
 
@@ -41,9 +51,6 @@ export default function Page() {
     }, []); // 空の依存配列でコンポーネントのマウント時のみ実行
     return (
         <>
-        <body>
-
-
             <div className="body">
 
                 <div className="z-20">
@@ -77,9 +84,6 @@ export default function Page() {
                     </div>
                 </div>
             </div>
-
-
-        </body>
         </>
     )
 };

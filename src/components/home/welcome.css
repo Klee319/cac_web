@@ -4,199 +4,147 @@
 @tailwind components;
 @tailwind utilities;
 
-@media (max-width: 428px) and (max-device-height: 667px) {
-    /* GoogleアプリまたはSafari以外のブラウザ用 */
-    .google .welcome {
-        height: 650px;
-    }
-
-    .google .welcome-main {
-    }
-
-    .google .cac-cat {
-        width: 200px;
-        height: 200px;
-        transform: translateX(20px);
-        position: relative ; /* レイアウト調整 */
-    }
-
-    .google .welcome-text {
-        position: relative ;
-        margin-top: 350px;
-        text-align: center;
-    }
-
-    .google .cac-logoL {
-        position: relative;
-        margin-top: -120px;
-    }
 
 
-    .safari .welcome-main {
-    }
-    .safari .cac-cat{
-        width: 200px;
-        height: 200px;
-        transform: translateX(30px);
-    }
-    .safari .welcome-text{
-    }
-    .safari .cac-logoL{
-    }
-
+body{
+    --vh: 1vh;
 }
-
-
-
+/*スマホ*/
 @media (max-width: 428px) {
-    /* GoogleアプリまたはSafari以外のブラウザ用 */
     .google .welcome {
-        height: 650px;
-    }
+        height: calc(var(--vh)*100);
 
-    .google .welcome-main {
     }
 
     .google .cac-cat {
-        width: 200px;
-        height: 200px;
-        transform: translateX(20px);
-        position: relative ; /* レイアウト調整 */
-    }
+        position: absolute ;
+        top:  calc(var(--vh)*15);
+        margin-left: 20vw;
+        height:  calc(var(--vh)*60);
+        width:auto;
 
-    .google .welcome-text {
-        position: relative ;
-        margin-top: 350px;
-        text-align: center;
     }
 
     .google .cac-logoL {
-        position: relative;
-        margin-top: -120px;
+        position: absolute;
+        bottom:  calc(var(--vh)*5);
+        height:  calc(var(--vh)*13);
+        width: auto;
     }
 
-
-}
-
-/* スマホより大きい（小さめ表示)*/
-@media (min-width: 428px) {
-    .welcome-main {
-    }
-    .cac-cat{
-        width: 350px;
-        height: 350px;
-        transform: translateX(50px);
-    }
-    .welcome-text{
-        margin-bottom: 0;
-        bottom: 176px;
-    }
-    .cac-logoL{
-        width: 300px;
-        height: 140px;
-        bottom: 0;
+    .safari .welcome {
+        height: 100svh;
     }
 
-}
-/* タブレットより大きい（大きめ表示） */
-@media (min-width: 768px) {
-    .cac-logoL{
-        width: 380px;
-        height: 158px;
+    .safari .cac-cat {
+        position: absolute ; /* レイアウト調整 */
+        top: 12svh;
+        margin-left: 20vw;
+        height: 60vh;
+        width: auto;
+
+    }
+
+    .safari .cac-logoL {
+        position: absolute;
+        bottom: 5svh;
+        height: 13svh;
+        width: auto;
     }
 
 }
 
-
-/* タブレット用（横向き表示の時） */
-@media (min-width:1024px) and (max-height:960px) and (orientation: landscape) {
-    .tablet.google .welcome {
-        height: 650px;
+/* 横向き(Googleからのスマホ・タブレットアクセスを除く)*/
+@media (min-width:428px) and (min-aspect-ratio: 4/3) {
+    .welcome {
+        height: 100vh;
     }
 
-    .tablet.google .welcome-main {
+    .cac-cat {
+        position: absolute;
+        top: 10vh;
+        margin-left: 5vw;
+        height: 65vh;
+        width: auto;
+
     }
 
-    .tablet.google .cac-cat {
-        width: 200px;
-        height: 200px;
-        transform: translateX(20px);
-        position: relative; /* レイアウト調整 */
+    .cac-logoL {
+        position: absolute;
+        bottom: 5vh;
+        height: 18vh;
+        width: auto;
     }
 
-    .tablet.google .welcome-text {
-        position: relative ;
-        margin-top: 350px;
-        text-align: center;
-    }
-
-    .tablet.google .cac-logoL {
-        position: relative ;
-        margin-top: -140px;
-    }
 }
 
 /* タブレット用（縦向き表示の時） */
 @media (max-width:1280px) and (min-height:768px) and (orientation: portrait) {
-    .welcome{
-        height: 800px;
+    .welcome {
+        height: 60svh;
     }
-    .cac-cat{
-        width: 350px;
-        height: 350px;
-        transform: translateX(50px);
+
+    .cac-cat {
+        position: absolute;
+        top: 7svh;
+        margin-left: 7vw;
+        height: 35svh;
+        width: auto;
+
     }
-    .welcome-text{
-        margin-bottom: 0;
-        bottom: 176px;
-    }
-    .cac-logoL{
-        width: 300px;
-        height: 140px;
-        bottom: 0;
+
+    .cac-logoL {
+        position: absolute;
+        bottom: 5svh;
+        height: 10svh;
+        width: auto;
     }
 }
 
 
 /* スマホ（横向き表示の時（高さ不足）) */
-@media (max-height: 500px) {
-    .welcome-main {
-    }
-    .cac-cat{
-        width: 200px;
-        height: 200px;
-        transform: translateX(20px) translateY(-100px);
-    }
-    .welcome-text{
-        display: none;
-    }
-    .cac-logoL{
-        width: 280px;
-        height: 93px;
-        margin-bottom: 70px;
-    }
-
+@media (max-height: 428px){
     .google .welcome {
-        height: 300px;
-    }
+        height: calc(var(--vh)*100);
 
-    .google .welcome-main {
     }
 
     .google .cac-cat {
-        margin-top: -80px;
-        width: 100px;
-        height: 100px;
-        transform: translateX(20px);
-        position: relative ; /* レイアウト調整 */
-    }
+        position: absolute ;
+        top:  calc(var(--vh)*5);
+        margin-left: 5vw;
+        height:  calc(var(--vh)*65);
+        width:auto;
 
-    .google .welcome-text {
-        display: none;
     }
 
     .google .cac-logoL {
-        position: relative;
-        margin-top: 140px;
+        position: absolute;
+        bottom:  calc(var(--vh)*5);
+        height:  calc(var(--vh)*20);
+        width: auto;
+    }
+}
+
+/* タブレット用（横向き表示の時） */
+@media (min-width:1024px) and (max-height:960px) and (orientation: landscape) {
+    .tablet.google .welcome {
+        height: calc(var(--vh)*100);
+    }
+
+    .tablet.google .cac-cat {
+        position: absolute;
+        top: calc(var(--vh)*10);
+        margin-left: 5vw;
+        height: calc(var(--vh)*65);
+        width: auto;
+
+    }
+
+    .tablet.google .cac-logoL {
+        position: absolute;
+        bottom: calc(var(--vh)*5);
+        height: calc(var(--vh)*20);
+        width: auto;
     }
 }
