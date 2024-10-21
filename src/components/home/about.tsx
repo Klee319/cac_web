@@ -2,7 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
-
+import "./about.css";
 const descriptions = [
     {
         title: "1.デジタル系創作団体",
@@ -16,8 +16,7 @@ const descriptions = [
         title: "2.独自の班制度",
         description: [
             "専攻している分野に分かれた「班」システムを採用。",
-            "誰が何班に所属しているかが分かるので「専門外だけど...」という場合に気軽に教えてもらえる相手を見つけたり、創作活動を進めていて自分にはできないところを助けてくれたり人を探したりすることが簡単にできます。" ,
-            "技術習得のために欲しかった書籍を買ってもらえることも...",
+            "同じ専攻の仲間と協力することでさらに技術や知識に磨きがかかります。技術習得のために欲しかった書籍を買ってもらえることも...",
             "班の種類と班ごとの詳しい概要は「GROUP」で確認できます。"
 
 
@@ -29,8 +28,8 @@ const descriptions = [
         title: "3.溢れ出る創作意欲",
         description: [
             "創作活動をするといいことがたくさん。",
-            "毎月各班が主催するコンテストが開催。入賞すれば賞金を手に入れられるチャンスです。どの班からも参加できるので新たな道を踏み出すきっかけになるかもしれません。" ,
-            "コンテスト以外でも作った作品は必ず日の目を浴びてくれます。オンラインでメンバーからリアクションをもらったり、神山祭に展示したり..."
+            "毎月各班が主催するコンテストが開催。入賞すれば報酬を手に入れられるチャンスです。" ,
+            "コンテスト以外でも作った作品は必ず日の目を浴びてくれます。オンラインでメンバーからリアクションをもらったり、神山祭（学祭）に展示したり..."
         ],
     },
     {
@@ -38,14 +37,15 @@ const descriptions = [
         description: [
             "部活から強制的に渡されるタスクは基本ありません。",
             "活動時間中には好きなことができます。絵を描いたり、プログラミングをしたり...。迷惑さえかけなければ、雑談やゲームをしてもらっても大丈夫です。",
-            "自分のやりたいことを見つけて、自分で進めることができる部活です。そんな人たちを尊重すべく所属する班の数にさえ制限はありません"
+            "自分のやりたいことを見つけて、自分で進めることができる部活です。"
         ],
     },
     {
         title: "5.主体性",
         description: [
             "自ら進んで活動することが求められます。",
-            "自由で強制されない、すなわち自分から動かなければ何も起こらない環境です。主体的に活動するほど部活の恩恵が大きくなっていくことでしょう",
+            "自由で強制されない、すなわち自分から動かなければ何も起こらない環境です。主体的に活動するほど部活の恩恵が大きくなっていくことでしょう。",
+            "所属する班の数に制限はありません。色々なことにチャレンジしましょう。"
         ],
     },
 ];
@@ -88,16 +88,29 @@ export default function About() {
                 <div className="w-1/3 mx-auto h-0.5 bg-blue-400 mb-10"></div>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between space-y-12 md:space-y-0 md:space-x-12 w-full">
-                <div className="w-full md:w-1/2 flex justify-between items-center">
-                    <span
+            <div className="flex items-center justify-between flex-row about-content">
+
+                {/* 画像部分 */}
+                <div className="mt-8 md:mt-0 items center about-image">
+                    <Image
+                        src="/about/state_board.jpg"
+                        alt="作業風景"
+                        width={520}
+                        height={490}
+                        className="object-contain "
+                    />
+                </div>
+
+                {/* テキスト部分 */}
+                <div className="flex flex-row items-center justify-between about-text">
+                    <div
                         onClick={prevPage}
-                        className="text-4xl cursor-pointer nextButton"
+                        className="text-4xl cursor-pointer mr-1.5"
                     >
                         &#60;
-                    </span>
+                    </div>
 
-                    <div className="relative w-[80%] max-w-[600px] h-[300px]">
+                    <div className="relative w-[85%] ">
                         <AnimatePresence initial={false} custom={direction} mode="wait">
                             <motion.div
                                 key={pageIndex}
@@ -107,43 +120,32 @@ export default function About() {
                                 animate="center"
                                 exit="exit"
                                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                                className="absolute w-full h-full"
-                                style={{ willChange: "transform, opacity" }}
+                                className="motion-container"
                             >
-                                <div className="text-left break-words md:px-0 max-w-[400px] mx-auto pb-10">
-                                    <h2 className="text-2xl font-bold mb-12 ">
+                                <div className="text-left break-words px-4 md:px-0 pb-10">
+                                    <h2 className="text-2xl font-bold mb-12">
                                         {descriptions[pageIndex].title}
                                     </h2>
-                                    {descriptions[pageIndex].description.map(
-                                        (line, index) => (
-                                            <p key={index} className="mb-1.5 leading-relaxed">
-                                                {line}
-                                            </p>
-                                        )
-                                    )}
+                                    {descriptions[pageIndex].description.map((line, index) => (
+                                        <p key={index} className="mb-1.5 leading-relaxed">
+                                            {line}
+                                        </p>
+                                    ))}
                                 </div>
                             </motion.div>
                         </AnimatePresence>
                     </div>
 
-                    <span
+                    <div
                         onClick={nextPage}
-                        className="text-4xl cursor-pointer nextButton"
+                        className="text-4xl cursor-pointer "
                     >
                         &#62;
-                    </span>
+                    </div>
                 </div>
 
-                <div className="w-full md:w-1/2 flex justify-center mt-8 md:mt-0">
-                    <Image
-                        src="/about/state_board.jpg"
-                        alt="作業風景"
-                        width={520}
-                        height={490}
-                        className="object-contain"
-                    />
-                </div>
             </div>
         </div>
+
     );
 }
