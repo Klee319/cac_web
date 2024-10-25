@@ -8,7 +8,7 @@ export default function Event() {
                 <div className="text-center">
                     <h1 className="text-7xl font-moon">Event</h1>
                     <p className="pb-2">年間行事</p>
-                    <div className="w-1/3 mx-auto  h-0.5 bg-blue-400 mb-20"></div>
+                    <div className="w-1/3 mx-auto  h-0.5 border-color-dark mb-20"></div>
                 </div>
                 <div className="flex flex-wrap justify-center items-center">
                     <div>

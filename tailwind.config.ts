@@ -28,16 +28,13 @@ const config: Config = {
         "zapfino": "zapfino",
         "Hannari": "Hannari",
         "Verdana": "Verdana",
+        "zen-kurenaido":"zen-kurenaido"
       },
       width: {
         'event': '38rem',
         'event-image': '44rem',
       },
       // カスタムスクリーン (縦幅対応)
-      screens: {
-        'mobile-landscape': { 'raw': '(max-height: 600px)' }, // 縦600px以下に適用
-        'tablet-portrait': { 'raw': '(min-height: 768px) and (max-width: 1024px)' }, // 縦900px以下に適用
-      },
       display: ['safari', 'chrome'],
     },
   },

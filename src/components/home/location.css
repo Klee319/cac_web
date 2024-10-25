@@ -1,0 +1,48 @@
+
+/*スマホ*/
+@media (max-width: 428px) {
+    .google .location-title{
+        font-size: 10vw;
+    }
+    .google .date{
+        font-size: 8vw;
+    }
+    .google .date-content{
+        margin-left: 3.5vw;
+        margin-right: 3.5vw;
+    }
+    .google .top-m{
+        padding-top: 8vw;
+    }
+    .google .place{
+        font-size: 6vw;
+    }
+    .safari .location-title{
+        font-size: 10vw;
+    }
+    .safari .date{
+        font-size: 8vw;
+    }
+    .safari .place{
+        font-size: 6vw;
+    }
+    .safari .top-m{
+        padding-top: 8vw;
+    }
+    .safari .date-content{
+        margin-left: 3.5vw;
+        margin-right: 3.5vw;
+    }
+
+
+}
+
+/* スマホ（横向き表示の時（高さ不足）) */
+@media (max-height: 428px){
+    .google .top-m{
+        padding-top: calc(var(--vh) * 10);
+    }
+    .safari .top-m{
+        padding-top: 10svh;
+    }
+}

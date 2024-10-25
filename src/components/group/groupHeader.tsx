@@ -2,7 +2,7 @@
 import {useState} from "react";
 import Image from "next/image";
 // @ts-ignore
-import cacLogo from '../../../../public/logo/newCAC.png';
+import cacLogo from '../../../public/logo/newCAC.png';
 import SwitchLightDark from "@/components/main/switchLightDark";
 
 export default function GroupHeader() {

@@ -5,7 +5,7 @@ import Image from "next/image";
 import "./about.css";
 const descriptions = [
     {
-        title: "1.デジタル系創作団体",
+        title: "デジタル系創作団体",
         description: [
             "CAC、正式名称:電子計算機応用部はデジタル系の創作活動を行っている団体です。",
             "活動日には新歓祭や神山祭に向けて創作活動に取り組んでおり、仲間と切磋琢磨することで、1人では作れなかった創作物を生み出すことができます。",
@@ -13,7 +13,7 @@ const descriptions = [
         ],
     },
     {
-        title: "2.独自の班制度",
+        title: "独自の班制度",
         description: [
             "専攻している分野に分かれた「班」システムを採用。",
             "同じ専攻の仲間と協力することでさらに技術や知識に磨きがかかります。技術習得のために欲しかった書籍を買ってもらえることも...",
@@ -25,7 +25,7 @@ const descriptions = [
         ],
     },
     {
-        title: "3.溢れ出る創作意欲",
+        title: "創作意欲溢れ出る環境",
         description: [
             "創作活動をするといいことがたくさん。",
             "毎月各班が主催するコンテストが開催。入賞すれば報酬を手に入れられるチャンスです。" ,
@@ -33,7 +33,7 @@ const descriptions = [
         ],
     },
     {
-        title: "4.自由な活動",
+        title: "自由な活動",
         description: [
             "部活から強制的に渡されるタスクは基本ありません。",
             "活動時間中には好きなことができます。絵を描いたり、プログラミングをしたり...。迷惑さえかけなければ、雑談やゲームをしてもらっても大丈夫です。",
@@ -41,7 +41,7 @@ const descriptions = [
         ],
     },
     {
-        title: "5.主体性",
+        title: "主体性を育む",
         description: [
             "自ら進んで活動することが求められます。",
             "自由で強制されない、すなわち自分から動かなければ何も起こらない環境です。主体的に活動するほど部活の恩恵が大きくなっていくことでしょう。",
@@ -85,10 +85,10 @@ export default function About() {
             <div className="text-center mb-8">
                 <h1 className="text-7xl font-moon">About</h1>
                 <p className="pb-2">C.A.C.について</p>
-                <div className="w-1/3 mx-auto h-0.5 bg-blue-400 mb-10"></div>
+                <div className="w-1/3 mx-auto h-0.5 border-color-dark mb-10"></div>
             </div>
 
-            <div className="flex items-center justify-between flex-row about-content">
+            <div className="pt-8 flex items-center justify-between flex-row about-content">
 
                 {/* 画像部分 */}
                 <div className="mt-8 md:mt-0 items center about-image">
@@ -105,7 +105,7 @@ export default function About() {
                 <div className="flex flex-row items-center justify-between about-text">
                     <div
                         onClick={prevPage}
-                        className="text-4xl cursor-pointer mr-1.5"
+                        className="text-4xl cursor-pointer mr-1.5 nextButton"
                     >
                         &#60;
                     </div>
@@ -123,7 +123,7 @@ export default function About() {
                                 className="motion-container"
                             >
                                 <div className="text-left break-words px-4 md:px-0 pb-10">
-                                    <h2 className="text-2xl font-bold mb-12">
+                                    <h2 className="text-2xl font-zen-kurenaido mb-12">
                                         {descriptions[pageIndex].title}
                                     </h2>
                                     {descriptions[pageIndex].description.map((line, index) => (
@@ -138,7 +138,7 @@ export default function About() {
 
                     <div
                         onClick={nextPage}
-                        className="text-4xl cursor-pointer "
+                        className="text-4xl cursor-pointer nextButton"
                     >
                         &#62;
                     </div>

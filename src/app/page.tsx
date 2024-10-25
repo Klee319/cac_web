@@ -1,18 +1,19 @@
 "use client";
-import About from '@/components/home/about';
+import About from '@/components/home/about/about';
 import Group from '@/components/home/group/group';
 import Location from '@/components/home/location';
 import Event from "@/components/home/event/event";
 import Footer from "@/components/main/footer";
-import HomeHeader from '@/components/home/homeHeader'
-import Welcome from "@/components/home/Welcome";
+import HomeHeader from '@/components/home/header/homeHeader'
+import Welcome from "@/components/home/welcome/Welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
 import {useEffect} from "react";
-import Head from "next/head";
 
 
 export default function Page() {
+
     useEffect(() => {
+
         const checkEngine = () => {
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             const isGoogleApp = /GSA/i.test(navigator.userAgent);
@@ -58,36 +59,41 @@ export default function Page() {
         window.addEventListener("orientationchange", setViewportHeight);
 
     }, []); // 空の依存配列でコンポーネントのマウント時のみ実行
+
     return (
         <>
             <div className="body">
 
-                <div className="z-20">
+                <div className="main-content relative">
+
                     <div id="welcome">
                         <Welcome></Welcome>
                     </div>
+
                     <div>
                         <HomeHeader></HomeHeader>
                     </div>
-                    <div className="h-[128px]">
+                    <div className="relative">
+                        <div className="stripe"></div>
+                        <div className="description-main">
+                            <div className="h-[128px]"></div>
+                            <div id="about">
+                                <About></About>
+                            </div>
+                            <div id="group">
+                                <Group></Group>
+                            </div>
+                            <div id="location">
+                                <Location></Location>
+                            </div>
+                            <div id="event">
+                                <Event></Event>
+                            </div>
+                            <div id="gallery">
+                                <GalleryPage></GalleryPage>
+                            </div>
+                        </div>
                     </div>
-                    <div id="about" >
-                        <About></About>
-                    </div>
-
-                    {/*<div id="group">*/}
-                    {/*    <Group></Group>*/}
-                    {/*</div>*/}
-
-                    {/*<div id="location">*/}
-                    {/*    <Location></Location>*/}
-                    {/*</div>*/}
-                    {/*<div id="event">*/}
-                    {/*    <Event></Event>*/}
-                    {/*</div>*/}
-                    {/*<div id="gallery">*/}
-                    {/*    <GalleryPage></GalleryPage>*/}
-                    {/*</div>*/}
                     <div>
                         <Footer></Footer>
                     </div>

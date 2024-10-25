@@ -32,3 +32,8 @@
     font-family: "hina";
     src: url("./HinaMincho-Regular.ttf") format("truetype");
 }
+
+@font-face{
+    font-family: "zen-kurenaido";
+    src: url("./ZenKurenaido-Regular.ttf") format("truetype");
+}

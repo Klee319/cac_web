@@ -1,8 +1,9 @@
 "use client";
 import {useState} from "react";
 import Image from "next/image";
+import "./homeHeader.css";
 // @ts-ignore
-import cacLogo from '../../../public/logo/newCAC.png';
+import cacLogo from '../../../../public/logo/newCAC.png';
 import SwitchLightDark from "@/components/main/switchLightDark";
 
 export default function HomeHeader() {

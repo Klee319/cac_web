@@ -1,5 +1,5 @@
 import Programing from "@/components/group/programing";
-import GroupHeader from "@/components/home/group/groupHeader";
+import GroupHeader from "@/components/group/groupHeader";
 import Graphic from "@/components/group/graphic";
 import Music from "@/components/group/music";
 import Cg from "@/components/group/cg";
