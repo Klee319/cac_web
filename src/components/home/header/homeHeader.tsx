@@ -1,12 +1,14 @@
-"use client";
 import {useState} from "react";
 import Image from "next/image";
 import "./homeHeader.css";
-// @ts-ignore
-import cacLogo from '../../../../public/logo/newCAC.png';
-import SwitchLightDark from "@/components/main/switchLightDark";
+import SwitchLightDark from '../../main/switchLightDark';
 
-export default function HomeHeader() {
+type Props = {
+    isDarkMode: boolean;
+    toggleMode: () => void;
+};
+
+export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
     const [isMenuOpen, setIsMenuOpen] = useState(false); // メニューの開閉状態
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // メニューの開閉をトグル
     const handleLinkClick = () => {
@@ -31,7 +33,7 @@ export default function HomeHeader() {
                             />
                         </div>
                         <div className="dark-switch text-left text-[12px] font-moon pt-1">
-                            <SwitchLightDark/>
+                            <SwitchLightDark isDarkMode={isDarkMode} toggleMode={toggleMode} />
                         </div>
                     </div>
 

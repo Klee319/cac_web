@@ -7,12 +7,15 @@ import Footer from "@/components/main/footer";
 import HomeHeader from '@/components/home/header/homeHeader'
 import Welcome from "@/components/home/welcome/Welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 
 export default function Page() {
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
+    const toggleMode = () => setIsDarkMode(!isDarkMode);
     useEffect(() => {
+
 
         const checkEngine = () => {
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -57,8 +60,13 @@ export default function Page() {
         checkDevice();
         addViewport();
         window.addEventListener("orientationchange", setViewportHeight);
-
-    }, []); // 空の依存配列でコンポーネントのマウント時のみ実行
+        // HTMLクラスの付与・削除
+        if (isDarkMode) {
+            document.documentElement.classList.add('dark-mode');
+        } else {
+            document.documentElement.classList.remove('dark-mode');
+        }
+    }, [isDarkMode]); // 空の依存配列でコンポーネントのマウント時のみ実行
 
     return (
         <>
@@ -67,11 +75,10 @@ export default function Page() {
                 <div className="main-content relative">
 
                     <div id="welcome">
-                        <Welcome></Welcome>
+                        <Welcome isDarkMode={isDarkMode} />
                     </div>
-
                     <div>
-                        <HomeHeader></HomeHeader>
+                        <HomeHeader isDarkMode={isDarkMode} toggleMode={toggleMode} />
                     </div>
                     <div className="relative">
                         <div className="stripe"></div>

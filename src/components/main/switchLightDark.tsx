@@ -1,24 +1,18 @@
-"use client"
-import { useState, useEffect } from 'react';
 
-export default function SwitchLightDark() {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+import React from 'react';
 
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark-mode');
-        } else {
-            document.documentElement.classList.remove('dark-mode');
-        }
-    }, [isDarkMode]);
+type Props = {
+    isDarkMode: boolean;
+    toggleMode: () => void;
+};
 
-    const toggleMode = () => {
-        setIsDarkMode(!isDarkMode);
-    };
-
+export default function SwitchLightDark({ isDarkMode, toggleMode }: Props) {
     return (
         <a onClick={toggleMode} className="cursor-pointer p-2 rounded text-left">
             {isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         </a>
     );
 }
+
+
+
