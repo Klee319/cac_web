@@ -14,8 +14,8 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
         // 人の画像内の「手の位置」を計算 (たとえば、横50%、縦70%の位置)
         const rect = catMain.getBoundingClientRect();
-        const handX = rect.left;
-        const handY = rect.top+rect.height*0.33;
+        const handX = rect.left-rect.width*0.04;
+        const handY = rect.top+rect.height*0.25;
 
         // 花の画像を「手の位置」に配置
         board.style.left = `${handX}px`;

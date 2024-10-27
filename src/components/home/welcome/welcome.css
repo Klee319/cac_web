@@ -129,7 +129,7 @@ body{
     .cac-board{
         position: absolute;
         width: auto;
-        height: 30%;
+        height: 35%;
         z-index: 4;
         transform-origin: center bottom;
         transform: translate(-50%, -100%);
