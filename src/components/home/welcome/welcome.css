@@ -10,6 +10,67 @@ body{
     --vh: 1vh;
 }
 
+.white-layer{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 0;
+    opacity: 1;
+}
+
+
+
+.welcome-background{
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    background:
+            repeating-radial-gradient(circle at top right,
+            #003399 0%, #003399 20%,  /* 深い青 */
+            #6699ff 20%, #6699ff 40%,  /* 明るい青 */
+            #cce6ff 40%, #cce6ff 60%,  /* 淡い青 */
+            #e289fa 60%, #e09ff6 80%,  /* 白 */
+            #cce6ff 80%, #cce6ff 90%,  /* 淡い青 */
+            #003399 90%, #003399 100%  /* 深い青 */
+            ), repeating-radial-gradient(circle at bottom left,
+            #003399 0%, #003399 20%,  /* 深い青 */
+            #6699ff 20%, #6699ff 40%,  /* 明るい青 */
+            #cce6ff 40%, #cce6ff 60%,  /* 淡い青 */
+            #d588ec 60%, #d88ef1 80%,  /* 白 */
+            #cce6ff 80%, #cce6ff 90%,  /* 淡い青 */
+            #003399 90%, #003399 100%  /* 深い青 */
+            ),repeating-linear-gradient(135deg, transparent, transparent 400px, rgb(3, 51, 148) 400px, rgb(3, 51, 148) 700px )
+            ,repeating-linear-gradient(45deg, transparent, transparent 400px, rgb(145, 254, 255) 400px, rgb(145, 254, 255) 1000px );
+    background-blend-mode: overlay;
+    /*透明度を設定*/
+    opacity: 0.5;
+}
+
+
+/* Canvasの設定 */
+#spotlightCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none; /* クリックを通過 */
+}
+
+/* 非表示のクラス */
+.del {
+    visibility: hidden;
+}
+
+.spotlightL, .spotlightR, .spotlightMain {
+    position: absolute;
+}
+
 
 /*スマホ*/
 @media (max-width: 428px) {
@@ -60,83 +121,84 @@ body{
 
 /* 横向き(Googleからのスマホ・タブレットアクセスを除く)*/
 @media (min-width:428px) and (min-aspect-ratio: 4/3) {
-
-
-
-    .welcome-background{
-        top:0;
-        left:0;
-        width: 100vw;
+    .content{
+        width: 100%; /* 親要素の幅を100%に */
         height: 100vh;
-        background:
+        margin: auto;
+    }
+    .cac-board{
+        position: absolute;
+        width: auto;
+        height: 30%;
+        z-index: 4;
+        transform-origin: center bottom;
+        transform: translate(-50%, -100%);
+    }
 
-        repeating-radial-gradient(circle at top right,
-        #003399 0%, #003399 20%,  /* 深い青 */
-        #6699ff 20%, #6699ff 40%,  /* 明るい青 */
-        #cce6ff 40%, #cce6ff 60%,  /* 淡い青 */
-        #e289fa 60%, #e09ff6 80%,  /* 白 */
-        #cce6ff 80%, #cce6ff 90%,  /* 淡い青 */
-        #003399 90%, #003399 100%  /* 深い青 */
-        ), repeating-radial-gradient(circle at bottom left,
-        #003399 0%, #003399 20%,  /* 深い青 */
-        #6699ff 20%, #6699ff 40%,  /* 明るい青 */
-        #cce6ff 40%, #cce6ff 60%,  /* 淡い青 */
-        #d588ec 60%, #d88ef1 80%,  /* 白 */
-        #cce6ff 80%, #cce6ff 90%,  /* 淡い青 */
-        #003399 90%, #003399 100%  /* 深い青 */
-        ),repeating-linear-gradient(135deg, transparent, transparent 400px, rgb(3, 51, 148) 400px, rgb(3, 51, 148) 700px )
-        ,repeating-linear-gradient(45deg, transparent, transparent 400px, rgb(145, 254, 255) 400px, rgb(145, 254, 255) 1000px );
-        background-blend-mode: multiply;
-        /*透明度を設定*/
-        opacity: 0.7;
+    .cac-cat-main {
+        position: absolute;
+        top:45vh;
+        left: 52vw;
+        height: 65%;
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%); /* 中心に配置するための調整 */
+    }
+
+    .cac-logoL {
+        position: absolute;
+        bottom: -5vh;
+        left: 50vw;
+        height: 18%;
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
     }
 
     .welcome {
         height: 100vh;
     }
-
-    .cac-board{
-        position: absolute;
-        left:35vw;
-        top: 15vh;
+    /* キャラクターのスタイル */
+    .catA {
+        width: 200px;
         height: auto;
-        width: 15vw;
-        z-index: 3;
-        transform-origin: center bottom;
-    }
-
-    .cac-cat-main {
         position: absolute;
-        top:10vh;
-        margin-left: 5vw;
-        height: 65vh;
-        width: auto;
+        top:0;
+        right: 6vw;
+        z-index: 3;
 
     }
-
-    /* Canvasの設定 */
-    #spotlightCanvas {
+    .catB {
+        width: 150px;
+        height: auto;
         position: absolute;
         top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 5;
-        pointer-events: none; /* クリックを通過 */
+        left: 4vw;
+        z-index: 3;
+
     }
 
-
-
-
-
-
-    .cac-logoL {
-        position: absolute;
-        bottom: 5vh;
-        height: 18vh;
-        width: auto;
+    .spotlightL {
+        top: 60vh;
+        left: 5vh;
+        height: 30vh; /* 高さの明示的な指定 */
+        width: 30vh; /* 幅の明示的な指定 */
     }
 
+    .spotlightR {
+        top: 20vh;
+        right: 8vh;
+        height: 30vh; /* 高さの明示的な指定 */
+        width: 30vh; /* 幅の明示的な指定 */
+    }
+
+    .spotlightMain {
+        margin-left: auto;
+        margin-top: 10vh;
+        height: 100vh; /* 高さの明示的な指定 */
+        width: 100vh; /* 幅の明示的な指定 */
+
+    }
 }
 
 /* タブレット用（縦向き表示の時） */
@@ -209,66 +271,8 @@ body{
         width: auto;
     }
 }
-/* キャラクターのスタイル */
-.catA {
-    width: 200px;
-    height: auto;
-    position: absolute;
-    top:0;
-    right: 6vw;
-    z-index: 3;
-
-}
-.catB {
-    width: 150px;
-    height: auto;
-    position: absolute;
-    top: 0;
-    left: 4vw;
-    z-index: 3;
-
-}
 
 
 
-/* 非表示のクラス */
-.del {
-    visibility: hidden;
-}
 
-.spotlightL, .spotlightR, .spotlightMain {
-    position: absolute;
-}
 
-.spotlightL {
-    top: 60vh;
-    left: 5vh;
-    height: 30vh; /* 高さの明示的な指定 */
-    width: 30vh; /* 幅の明示的な指定 */
-}
-
-.spotlightR {
-    top: 20vh;
-    right: 8vh;
-    height: 30vh; /* 高さの明示的な指定 */
-    width: 30vh; /* 幅の明示的な指定 */
-}
-
-.spotlightMain {
-    top: 10vh;
-    left: 25vw;
-    height: 50vw; /* 高さの明示的な指定 */
-    width: 50vw; /* 幅の明示的な指定 */
-
-}
-
-.white-layer{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: white;
-    z-index: 0;
-    opacity: 1;
-}

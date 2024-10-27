@@ -5,7 +5,7 @@ import Location from '@/components/home/location';
 import Event from "@/components/home/event/event";
 import Footer from "@/components/main/footer";
 import HomeHeader from '@/components/home/header/homeHeader'
-import Welcome from "@/components/home/welcome/Welcome";
+import Welcome from "@/components/home/welcome/welcome";
 import GalleryPage from "@/components/home/gallery/GalleryPage";
 import {useEffect, useState} from "react";
 
