@@ -19,7 +19,7 @@ export default function GroupHeader() {
                     <div className="flex items-center space-x-4">
                         <Image src={cacLogo} alt="C.A.C. logo" style={{ width: 100, height: 'auto' }} className="block" />
                         <div className="text-1xl font-moon">
-                            <SwitchLightDark />
+                            <SwitchLightDark  isDarkMode/>
                         </div>
                     </div>
 

@@ -160,33 +160,33 @@ body{
     }
     /* キャラクターのスタイル */
     .catA {
-        width: 200px;
-        height: auto;
+        width: auto;
+        height: 80vh;
         position: absolute;
         top:0;
         right: 6vw;
         z-index: 3;
-
+        transform-origin: 0 0;
     }
     .catB {
-        width: 150px;
-        height: auto;
+        width: auto;
+        height:80vh;
         position: absolute;
         top: 0;
         left: 4vw;
         z-index: 3;
-
+        transform-origin: 0 0;
     }
 
     .spotlightL {
-        top: 60vh;
+        position: absolute;
         left: 5vh;
         height: 30vh; /* 高さの明示的な指定 */
         width: 30vh; /* 幅の明示的な指定 */
     }
 
     .spotlightR {
-        top: 20vh;
+        position: absolute;
         right: 8vh;
         height: 30vh; /* 高さの明示的な指定 */
         width: 30vh; /* 幅の明示的な指定 */

@@ -21,13 +21,13 @@ export default function Welcome({ isDarkMode}: Props) {
 
 
             <div className="animation-container">
+                <div className="spotlightL"></div>
+                <div className="spotlightR"></div>
                 <Image src="/home/welcome/cacCat1.png" width={100} height={100} alt="Character" className="catA del" />
                 <Image src="/home/welcome/cacCat5.png" width={100} height={100} alt="Character" className="catB del" />
             </div>
 
             <div className="relative flex flex-col items-center justify-center content">
-                <div className="spotlightL"></div>
-                <div className="spotlightR"></div>
                 <div className="spotlightMain"></div>
                 <Image
                     src="/home/welcome/backgroundBoard.png"

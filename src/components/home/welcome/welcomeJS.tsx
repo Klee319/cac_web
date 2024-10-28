@@ -9,6 +9,18 @@ export default function WelcomeJS({isDarkMode}: Props) {
     const updatePosition = () => {
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
+        const catA = document.querySelector('.catA') as HTMLElement | null;
+        const catB = document.querySelector('.catB') as HTMLElement | null;
+        const spotLightR = document.querySelector('.spotlightR') as HTMLElement | null;
+        const spotLightL = document.querySelector('.spotlightL') as HTMLElement | null;
+
+        //猫とスポットライトの位置を更新
+        if (spotLightR && spotLightL && catA && catB) {
+            const rectR = catA.getBoundingClientRect();
+            const rectL = catB.getBoundingClientRect();
+            spotLightR.style.top = `${-250+window.innerHeight*0.5}px`;
+            spotLightL.style.top = `${550}px`;
+        }
 
         if (!catMain || !board) return;
 
@@ -63,7 +75,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
         gravity = 1.3,
         bounceFactor = 0.7
     ) => {
-        let positionY = -950; // 初期位置から開始
+        let positionY = -750; // 初期位置から開始
         let velocity = 0;
         let angle = -1;
         let isBouncing = true;
@@ -105,12 +117,13 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
             animationId = requestAnimationFrame(startAnimation); // アニメーション再開
         };
-
+        window.addEventListener('load', updatePosition);
         window.addEventListener('click', onClick); // クリックイベント登録
 
         animationId = requestAnimationFrame(startAnimation); // アニメーション開始
 
         return () => {
+            window.removeEventListener('load', updatePosition);
             window.removeEventListener('click', onClick); // クリーンアップ
         };
     };
@@ -123,14 +136,15 @@ export default function WelcomeJS({isDarkMode}: Props) {
         const cacLogo = document.querySelector('.cac-logoL') as HTMLElement | null;
         const catA = document.querySelector('.catA') as HTMLElement | null;
         const catB = document.querySelector('.catB') as HTMLElement | null;
+        const container = document.querySelector('.animation-container') as HTMLElement | null;
 
         //常時動作のアニメーション開始
-        if (catA && catB) {
+        if (catA && catB && catMain) {
             //準備ができたら非表示解除
             catA.classList.remove('del');
-            createAnimation(catA, -380, 7,0.04); // 最終位置まで落下アニメーション
+            createAnimation(catA, -300, 7,0.05); // 最終位置まで落下アニメーション
             catB.classList.remove('del');
-            createAnimation(catB, 20,20,0.01);
+            createAnimation(catB, 50,20,0.01);
         }
 
         if (board && catMain && cacLogo) {
@@ -142,7 +156,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
         }
 
-        updatePosition();
+
 
         // リスナーの登録
         window.addEventListener('resize', handleResize);
@@ -263,7 +277,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
             if (animationFrameId) cancelAnimationFrame(animationFrameId); // アニメーションのキャンセル
             if (ctx) ctx.clearRect(0, 0, canvas!.width, canvas!.height); // Canvasのクリア
         };
-    }, [isDarkMode, windowSize]);
+    }, [isDarkMode, windowSize,]);
 
     return (
         <>
