@@ -166,7 +166,7 @@ body{
         top:0;
         right: 6vw;
         z-index: 3;
-        transform-origin: 0 0;
+        transform-origin: bottom center;
     }
     .catB {
         width: auto;
@@ -175,7 +175,7 @@ body{
         top: 0;
         left: 4vw;
         z-index: 3;
-        transform-origin: 0 0;
+        transform-origin: bottom center;
     }
 
     .spotlightL {

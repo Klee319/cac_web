@@ -6,76 +6,66 @@ type Props = {
 };
 
 export default function WelcomeJS({isDarkMode}: Props) {
+    const [windowSize, setWindowSize] = useState({
+        width:0,
+        height: 0,
+    });
+
     const updatePosition = () => {
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
         const catA = document.querySelector('.catA') as HTMLElement | null;
         const catB = document.querySelector('.catB') as HTMLElement | null;
-        const spotLightR = document.querySelector('.spotlightR') as HTMLElement | null;
-        const spotLightL = document.querySelector('.spotlightL') as HTMLElement | null;
+        const spotlightL = document.querySelector('.spotlightL') as HTMLElement | null;
+        const spotlightR = document.querySelector('.spotlightR') as HTMLElement | null;
 
-        //猫とスポットライトの位置を更新
-        if (spotLightR && spotLightL && catA && catB) {
-            const rectR = catA.getBoundingClientRect();
-            const rectL = catB.getBoundingClientRect();
-            spotLightR.style.top = `${-250+window.innerHeight*0.5}px`;
-            spotLightL.style.top = `${550}px`;
+        if (catA && spotlightR) {
+            const catARect = catA.getBoundingClientRect();
+            spotlightR.style.top = `${catARect.bottom - catARect.width * 1.3}px`;
+            spotlightR.style.right = `${window.innerWidth - catARect.right * 1.05}px`;
+        }
+
+        if (catB && spotlightL) {
+            const catBRect = catB.getBoundingClientRect();
+            spotlightL.style.top = `${catBRect.bottom - catBRect.width * 1.3}px`;
+            spotlightL.style.left = `${catBRect.left * 0.85}px`;
         }
 
         if (!catMain || !board) return;
 
-        // 人の画像内の「手の位置」を計算 (たとえば、横50%、縦70%の位置)
         const rect = catMain.getBoundingClientRect();
-        const handX = rect.left-rect.width*0.04;
-        const handY = rect.top+rect.height*0.25;
+        const handX = rect.left - rect.width * 0.04;
+        const handY = rect.top + rect.height * 0.25;
 
-        // 花の画像を「手の位置」に配置
         board.style.left = `${handX}px`;
         board.style.top = `${handY}px`;
-    }
-
-    const [windowSize, setWindowSize] = useState({
-        width: window.innerWidth,
-        height: window.innerHeight,
-    });
-
-    // ウィンドウサイズと向き変更の監視
-    const handleResize = () => {
-        setWindowSize({
-            width: window.innerWidth,
-            height: window.innerHeight,
-        });
     };
 
 
     const angle = 5;
-    let angleValue = -angle - 35; // 現在の角度を管理する変数
-    let direction = 1; // 回転の方向
+    let angleValue = -angle - 35;
+    let direction = 1;
     const animateBoard = (board: HTMLElement | null) => {
-        if (!board) return; // 要素が取得できなければ処理を終了
+        if (!board) return;
 
-        // 回転角度の更新
         angleValue += direction * 0.01;
         if (angleValue > angle - 35 || angleValue < -angle - 35) {
-            direction *= -1; // 回転方向を反転
+            direction *= -1;
         }
 
-        // 画像に回転を適用
         board.style.transform = `rotate(${angleValue}deg)`;
-
-        // 次のフレームで再描画
         requestAnimationFrame(() => animateBoard(board));
     };
 
     const createAnimation = (
         element: HTMLElement,
         finalPositionY: number,
-        amplitude : number,
-        frequency : number,
+        amplitude: number,
+        frequency: number,
         gravity = 1.3,
         bounceFactor = 0.7
     ) => {
-        let positionY = -750; // 初期位置から開始
+        let positionY = -750;
         let velocity = 0;
         let angle = -1;
         let isBouncing = true;
@@ -90,7 +80,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
                 velocity = -velocity * bounceFactor;
 
                 if (Math.abs(velocity) < 1) {
-                    isBouncing = false; // バウンド終了
+                    isBouncing = false;
                 }
             }
 
@@ -98,53 +88,53 @@ export default function WelcomeJS({isDarkMode}: Props) {
             const swayOffset = Math.sin(angle) * amplitude;
 
             element.style.transform = `translate(${swayOffset}px, ${positionY}px)`;
-
+            updatePosition();
             animationId = requestAnimationFrame(startAnimation);
         };
 
         const onClick = (event: MouseEvent) => {
-            const welcome = document.querySelector('.welcome'); // .headerの参照
+            const welcome = document.querySelector('.welcome');
             if (!(welcome && welcome.contains(event.target as Node))) {
-                return; // ヘッダー内のクリックを無視
+                return;
             }
 
             if (animationId !== null) cancelAnimationFrame(animationId);
 
             velocity = 0;
-            positionY = -750; // 初期位置に戻す
-            isBouncing = true; // バウンド再開
+            positionY = -750;
+            isBouncing = true;
             angle = 0;
 
-            animationId = requestAnimationFrame(startAnimation); // アニメーション再開
+            animationId = requestAnimationFrame(startAnimation);
         };
-        window.addEventListener('load', updatePosition);
-        window.addEventListener('click', onClick); // クリックイベント登録
 
-        animationId = requestAnimationFrame(startAnimation); // アニメーション開始
+        window.addEventListener('click', onClick);
+        animationId = requestAnimationFrame(startAnimation);
 
         return () => {
-            window.removeEventListener('load', updatePosition);
-            window.removeEventListener('click', onClick); // クリーンアップ
+            window.removeEventListener('click', onClick);
         };
     };
 
-
-    //初回のみ実行
     useEffect(() => {
+
+        const handleResize = () => {
+            setWindowSize({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
         const cacLogo = document.querySelector('.cac-logoL') as HTMLElement | null;
         const catA = document.querySelector('.catA') as HTMLElement | null;
         const catB = document.querySelector('.catB') as HTMLElement | null;
-        const container = document.querySelector('.animation-container') as HTMLElement | null;
 
-        //常時動作のアニメーション開始
         if (catA && catB && catMain) {
-            //準備ができたら非表示解除
             catA.classList.remove('del');
-            createAnimation(catA, -300, 7,0.05); // 最終位置まで落下アニメーション
+            createAnimation(catA, -300, 7, 0.05);
             catB.classList.remove('del');
-            createAnimation(catB, 50,20,0.01);
+            createAnimation(catB, 50, 20, 0.01);
         }
 
         if (board && catMain && cacLogo) {
@@ -152,32 +142,25 @@ export default function WelcomeJS({isDarkMode}: Props) {
             cacLogo.classList.remove('del');
             board.classList.remove('del');
             animateBoard(board);
-
-
         }
-
-
-
-        // リスナーの登録
+        handleResize();
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange', handleResize);
+        window.addEventListener('load', updatePosition);
 
-        // クリーンアップ
         return () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('orientationchange', handleResize);
-            if (catA || catB) window.removeEventListener('click', () => {
-            }); // クリーンアップ
+            window.removeEventListener('load', updatePosition);
         };
     }, []);
 
-
-    //ダークモードの変更時とリサイズ時に実行
     useEffect(() => {
+
         let spotlights: { x: number; y: number; r: number }[] = [];
-        let mouseSpot = {x: window.innerWidth / 2, y: window.innerHeight / 2, r: 150};
-        let animationFrameId: number | null = null; // アニメーションIDを管理
-        let initialized = false; // スポットライト初期化フラグ
+        let mouseSpot = { x: window.innerWidth / 2, y: window.innerHeight / 2, r: 150 };
+        let animationFrameId: number | null = null;
+        let initialized = false;
         const canvas = document.getElementById('spotlightCanvas') as HTMLCanvasElement | null;
         const ctx = canvas?.getContext('2d');
 
@@ -187,8 +170,8 @@ export default function WelcomeJS({isDarkMode}: Props) {
         };
 
         const onMouseMove = (e: MouseEvent) => {
-            if (!isDarkMode) return; // ダークモードでのみ実行
-            mouseSpot = {x: e.clientX, y: e.clientY, r: 150};
+            if (!isDarkMode) return;
+            mouseSpot = { x: e.clientX, y: e.clientY, r: 150 };
             spotlights[0] = mouseSpot;
 
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -252,32 +235,29 @@ export default function WelcomeJS({isDarkMode}: Props) {
             spotlights = [mouseSpot, LLSpot, LRSpot, MainSpot];
 
             resizeCanvas();
-            drawSpotlights(spotlights); // 初回描画
-
+            drawSpotlights(spotlights);
             window.addEventListener('mousemove', onMouseMove);
             window.addEventListener('resize', onResize);
 
             initialized = true;
         };
 
-        // モード切り替えに応じたスポットライトの管理
         if (isDarkMode && !initialized) {
             initializeSpotlight();
         } else if (!isDarkMode) {
-            removeListeners(); // ライトモードでリスナーを削除
-            if (ctx) ctx.clearRect(0, 0, canvas!.width, canvas!.height); // Canvasをクリア
+            removeListeners();
+            if (ctx) ctx.clearRect(0, 0, canvas!.width, canvas!.height);
             initialized = false;
         }
 
         updatePosition();
 
-        // クリーンアップ
         return () => {
             removeListeners();
-            if (animationFrameId) cancelAnimationFrame(animationFrameId); // アニメーションのキャンセル
-            if (ctx) ctx.clearRect(0, 0, canvas!.width, canvas!.height); // Canvasのクリア
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            if (ctx) ctx.clearRect(0, 0, canvas!.width, canvas!.height);
         };
-    }, [isDarkMode, windowSize,]);
+    }, [isDarkMode, windowSize]);
 
     return (
         <>
