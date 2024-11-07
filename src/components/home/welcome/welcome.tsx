@@ -29,7 +29,6 @@ export default function Welcome({ isDarkMode}: Props) {
             </div>
 
             <div className="relative flex flex-col items-center justify-center content">
-                <div className="spotlightMain"></div>
                 <Image
                     src="/home/welcome/backgroundBoard.png"
                     alt="イメージキャラクター"

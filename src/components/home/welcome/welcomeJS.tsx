@@ -21,21 +21,21 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
         if (catA && spotlightR) {
             const catARect = catA.getBoundingClientRect();
-            spotlightR.style.top = `${catARect.bottom - catARect.width * 1.3}px`;
-            spotlightR.style.right = `${window.innerWidth - catARect.right * 1.05}px`;
+            spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.width * 1.2}px`;
+            spotlightR.style.right = `${window.innerWidth - (window.scrollX + catARect.right * 1.05)}px`;
         }
 
         if (catB && spotlightL) {
             const catBRect = catB.getBoundingClientRect();
-            spotlightL.style.top = `${catBRect.bottom - catBRect.width * 1.3}px`;
-            spotlightL.style.left = `${catBRect.left * 0.85}px`;
+            spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.width * 1.5}px`;
+            spotlightL.style.left = `${window.scrollX + catBRect.left * 0.6}px`;
         }
 
         if (!catMain || !board) return;
 
         const rect = catMain.getBoundingClientRect();
-        const handX = rect.left - rect.width * 0.04;
-        const handY = rect.top + rect.height * 0.25;
+        const handX = window.scrollX + rect.left - rect.width * 0.04;
+        const handY = window.scrollY + rect.top + rect.height * 0.25;
 
         board.style.left = `${handX}px`;
         board.style.top = `${handY}px`;
@@ -65,7 +65,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
         gravity = 1.3,
         bounceFactor = 0.7
     ) => {
-        let positionY = -750;
+        let positionY = -1150;
         let velocity = 0;
         let angle = -1;
         let isBouncing = true;
@@ -101,7 +101,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
             if (animationId !== null) cancelAnimationFrame(animationId);
 
             velocity = 0;
-            positionY = -750;
+            positionY = -1150;
             isBouncing = true;
             angle = 0;
 
@@ -130,9 +130,9 @@ export default function WelcomeJS({isDarkMode}: Props) {
         const catA = document.querySelector('.catA') as HTMLElement | null;
         const catB = document.querySelector('.catB') as HTMLElement | null;
 
-        if (catA && catB && catMain) {
+        if (catA && catB) {
             catA.classList.remove('del');
-            createAnimation(catA, -300, 7, 0.05);
+            createAnimation(catA,-800, 7, 0.05);
             catB.classList.remove('del');
             createAnimation(catB, 50, 20, 0.01);
         }
@@ -158,7 +158,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
     useEffect(() => {
 
         let spotlights: { x: number; y: number; r: number }[] = [];
-        let mouseSpot = { x: window.innerWidth / 2, y: window.innerHeight / 2, r: 150 };
+        let mouseSpot = { x: window.innerWidth / 2, y: window.innerHeight / 2, r:  0 };
         let animationFrameId: number | null = null;
         let initialized = false;
         const canvas = document.getElementById('spotlightCanvas') as HTMLCanvasElement | null;
@@ -171,7 +171,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
         const onMouseMove = (e: MouseEvent) => {
             if (!isDarkMode) return;
-            mouseSpot = { x: e.clientX, y: e.clientY, r: 150 };
+            mouseSpot = { x: e.clientX, y: e.clientY, r:  window.innerHeight/2 };
             spotlights[0] = mouseSpot;
 
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -215,9 +215,9 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
             const spotLightR = document.querySelector('.spotlightR') as HTMLElement | null;
             const spotLightL = document.querySelector('.spotlightL') as HTMLElement | null;
-            const spotLightMain = document.querySelector('.spotlightMain') as HTMLElement | null;
+            //const spotLightMain = document.querySelector('.spotlightMain') as HTMLElement | null;
 
-            if (!spotLightR || !spotLightL || !spotLightMain) return;
+            if (!spotLightR || !spotLightL ) return;
 
             const getSpotPosition = (element: HTMLElement) => {
                 const rect = element.getBoundingClientRect();
@@ -230,9 +230,9 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
             const LRSpot = getSpotPosition(spotLightR);
             const LLSpot = getSpotPosition(spotLightL);
-            const MainSpot = getSpotPosition(spotLightMain);
+            //const MainSpot = getSpotPosition(spotLightMain);
 
-            spotlights = [mouseSpot, LLSpot, LRSpot, MainSpot];
+            spotlights = [mouseSpot, LLSpot, LRSpot];
 
             resizeCanvas();
             drawSpotlights(spotlights);
