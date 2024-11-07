@@ -63,7 +63,8 @@ export default function WelcomeJS({isDarkMode}: Props) {
         amplitude: number,
         frequency: number,
         gravity = 1.3,
-        bounceFactor = 0.7
+        bounceFactor = 0.7,
+        onAnimationEnd?: () => void
     ) => {
         let positionY = -1150;
         let velocity = 0;
@@ -81,6 +82,8 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
                 if (Math.abs(velocity) < 1) {
                     isBouncing = false;
+                    if (onAnimationEnd) onAnimationEnd();
+                    return;
                 }
             }
 
@@ -88,7 +91,6 @@ export default function WelcomeJS({isDarkMode}: Props) {
             const swayOffset = Math.sin(angle) * amplitude;
 
             element.style.transform = `translate(${swayOffset}px, ${positionY}px)`;
-            updatePosition();
             animationId = requestAnimationFrame(startAnimation);
         };
 
@@ -117,24 +119,41 @@ export default function WelcomeJS({isDarkMode}: Props) {
     };
 
     useEffect(() => {
-
         const handleResize = () => {
             setWindowSize({
                 width: window.innerWidth,
                 height: window.innerHeight,
             });
+            updateSpotlightPositions();
         };
+
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
         const cacLogo = document.querySelector('.cac-logoL') as HTMLElement | null;
         const catA = document.querySelector('.catA') as HTMLElement | null;
         const catB = document.querySelector('.catB') as HTMLElement | null;
+        const spotlightL = document.querySelector('.spotlightL') as HTMLElement | null;
+        const spotlightR = document.querySelector('.spotlightR') as HTMLElement | null;
+
+        const updateSpotlightPositions = () => {
+            if (catA && spotlightR) {
+                const catARect = catA.getBoundingClientRect();
+                spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.width * 1.2}px`;
+                spotlightR.style.right = `${window.innerWidth - (window.scrollX + catARect.right * 1.05)}px`;
+            }
+
+            if (catB && spotlightL) {
+                const catBRect = catB.getBoundingClientRect();
+                spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.width * 1.5}px`;
+                spotlightL.style.left = `${window.scrollX + catBRect.left * 0.6}px`;
+            }
+        };
 
         if (catA && catB) {
             catA.classList.remove('del');
-            createAnimation(catA,-800, 7, 0.05);
+            createAnimation(catA, -800, 7, 0.05, 1.3, 0.7, updateSpotlightPositions);
             catB.classList.remove('del');
-            createAnimation(catB, 50, 20, 0.01);
+            createAnimation(catB, 50, 20, 0.01, 1.3, 0.7, updateSpotlightPositions);
         }
 
         if (board && catMain && cacLogo) {
@@ -143,6 +162,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
             board.classList.remove('del');
             animateBoard(board);
         }
+
         handleResize();
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange', handleResize);
