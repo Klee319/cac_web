@@ -159,6 +159,7 @@ body{
         z-index: 4;
         transform-origin: center bottom;
         transform: translate(-50%, -100%);
+        user-select: none;
     }
 
     .cac-cat-main {
@@ -169,6 +170,7 @@ body{
         width: auto;
         z-index: 3;
         transform: translate(-50%, -50%); /* 中心に配置するための調整 */
+        user-select: none;
     }
 
     .cac-logoL {
@@ -179,20 +181,18 @@ body{
         width: auto;
         z-index: 3;
         transform: translate(-50%, -50%);
+        user-select: none;
     }
 
-    .welcome {
-        height: 100vh;
-    }
     /* キャラクターのスタイル */
     .catA {
         width: auto;
-        height: 120vh;
+        height: 50vh;
         position: absolute;
-        top: 10vh;
-        right: 8vw;
+        right: 6vw;
         z-index: 3;
         transform-origin: bottom center;
+        user-select: none;
     }
     .catB {
         width: auto;
@@ -202,6 +202,7 @@ body{
         top: 0;
         z-index: 3;
         transform-origin: bottom center;
+        user-select: none;
     }
 
     .spotlightL {

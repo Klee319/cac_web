@@ -21,8 +21,8 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
         if (catA && spotlightR) {
             const catARect = catA.getBoundingClientRect();
-            spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.width * 1.2}px`;
-            spotlightR.style.right = `${window.innerWidth - (window.scrollX + catARect.right * 1.05)}px`;
+            spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.width*1.3}px`;
+            spotlightR.style.right = `${window.scrollX + catARect.right*0.01}px`;
         }
 
         if (catB && spotlightL) {
@@ -132,7 +132,7 @@ export default function WelcomeJS({isDarkMode}: Props) {
 
         if (catA && catB) {
             catA.classList.remove('del');
-            createAnimation(catA,-800, 7, 0.05);
+            createAnimation(catA,50, 7, 0.05);
             catB.classList.remove('del');
             createAnimation(catB, 50, 20, 0.01);
         }
