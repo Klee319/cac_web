@@ -7,7 +7,7 @@ export default function Location(){
             <div className=" pb-48">
                 <h1 className=" text-center location-title text-7xl font-moon">Location & Dates</h1>
                 <p className="pb-2 text-center">活動場所、日時</p>
-                <div className="w-2/3 mx-auto  h-0.5 bg-blue-400 mb-20"></div>
+                <div className="w-2/3 mx-auto  h-0.5 border-color-dark mb-20"></div>
                 <div className="flex flex-wrap justify-center w-full">
 
                     <div className="">

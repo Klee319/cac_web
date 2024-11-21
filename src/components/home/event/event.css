@@ -1,0 +1,69 @@
+/* 全体レイアウト */
+.timeline {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7vw;
+    position: relative;
+    width: 100%;
+    padding: 5vw 10vw;
+}
+
+/* 各行の配置 */
+.timeline-row {
+    display: flex;
+    justify-content: flex-end; /* 最初は右寄せ */
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.timeline-row.left {
+    justify-content: flex-start; /* 左寄せ */
+}
+
+.timeline-row.right {
+    justify-content: flex-end; /* 右寄せ */
+}
+
+/* カード */
+.timeline-item {
+    background: #fff;
+    border-radius: 8px;
+    width: 20vw;
+    height: 15vw;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    margin: 0 10px;
+}
+
+/* コネクタ（水平線） */
+.connector-horizontal {
+    height: 1vh;
+    background: #ccc;
+    flex-grow: 1;
+}
+
+/* コネクタ（縦線） */
+.connector-vertical {
+    position: absolute;
+    width: 1vh;
+    height: 15vh;
+    background: #ccc;
+    top: 100%; /* 行の下に配置 */
+}
+
+/* 左寄せの縦線位置 */
+.timeline-row.left .connector-vertical {
+    left: 100%; /* カードの右端に配置 */
+    margin-left: -10.5vw; /* 線が途切れないように微調整 */
+}
+
+/* 右寄せの縦線位置 */
+.timeline-row.right .connector-vertical {
+    left: 0; /* カードの左端に配置 */
+    margin-left: 9.5vw; /* 線が途切れないように微調整 */
+}
+
+
