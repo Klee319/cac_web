@@ -1,52 +1,50 @@
 import Image from "next-image-export-optimizer"
-// @ts-ignore
-import localImage from '../../../public/logo/logo.svg'
-// @ts-ignore
 import insragramSvg from '../../../public/logo/Instagram_logo_2016.svg'
-// @ts-ignore
 import XSvg from "../../../public/logo/X_logo_2023.svg"
-
+import "./footer.css"
 export default function Footer() {
     return (
-        <footer className="pb-5">
+        <footer className="pb-4 pt-4">
             {/* 境界線 */}
             <div className="flex items-center justify-center">
-            <div className="w-full h-0.5 border-color-dark mb-4"></div>
             </div>
             {/* フッターのメイン部分 */}
-            <div className="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0">
+            <div className="flex flex-row items-center justify-around space-y-0">
                 {/* ロゴとタイトル */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center logo">
                     <Image
                         src="/logo/newCAC.png"
                         alt="C.A.C. logo"
                         width={220}
                         height={100}
+                        className="cac"
                     />
-                    <h1 className="text-2xl font-zen-kurenaido text-color">電子計算機応用部</h1>
+                    <h1 className="font-zen-kurenaido text-color text">©電子計算機応用部</h1>
                 </div>
 
                 {/* ソーシャルリンク */}
-                <div className="flex items-center space-x-6">
-                    <h1 className="text-2xl font-zen-kurenaido text-color">公式SNS/お問い合わせ</h1>
-                    <a href="https://www.instagram.com/c_a_c_official">
-                        <Image
-                            src={insragramSvg}
-                            alt="Instagram"
-                            width={40}
-                            height={40}
-                            className="scale-100 hover:scale-125 transition-transform"
-                        />
-                    </a>
-                    <a href="https://twitter.com/c_a_c_official">
-                        <Image
-                            src={XSvg}
-                            alt="X"
-                            width={40}
-                            height={40}
-                            className="scale-100 hover:scale-125 transition-transform x-icon"
-                        />
-                    </a>
+                <div className="flex items-center social">
+                    <div className="flex">
+                        <a href="https://www.instagram.com/c_a_c_official">
+                            <Image
+                                src={insragramSvg}
+                                alt="Instagram"
+                                width={40}
+                                height={40}
+                                className="scale-100 hover:scale-125 transition-transform insta-logo mr-4"
+                            />
+                        </a>
+                        <a href="https://twitter.com/c_a_c_official">
+                            <Image
+                                src={XSvg}
+                                alt="X"
+                                width={40}
+                                height={40}
+                                className="scale-100 hover:scale-125 transition-transform x-icon"
+                            />
+                        </a>
+                    </div>
+                    <h1 className="font-zen-kurenaido text-color text">公式SNS/お問い合わせ</h1>
                 </div>
             </div>
         </footer>

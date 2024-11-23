@@ -1,47 +1,79 @@
-import React from "react";
-import "./event.css";
 
+import "./event.css";
+import React, { useEffect, useState } from "react";
 // イベントデータの型定義
 type EventData = {
     date: string;
     title: string;
-    location: string;
     image?: string;
 };
 
 const events: EventData[] = [
-    { date: "11/05", title: "第58回 神山祭", location: "京都産業大学", image: "path/to/image1.png" },
-    { date: "10/07", title: "あまてく一周年 記念パーティー", location: "京都産業大学", image: "path/to/image2.png" },
-    { date: "09/13", title: "あまてくアイディアソン feat. ベガコーポレーション", location: "TOMOSUBA 京都河原町店", image: "path/to/image3.png" },
-    { date: "09/14", title: "あまてく feat. ベガコーポレーション", location: "TOMOSUBA 京都河原町店", image: "path/to/image3.png" },
-    { date: "09/15", title: "あまてくアイディア feat. ベガコーポレーション", location: "TOMOSUBA 京都河原町店", image: "path/to/image3.png" },
-    { date: "09/16", title: "あまてくアイディアソン feat. ベガコーポレーション", location: "TOMOSUBA 京都河原町店", image: "path/to/image3.png" },
-    { date: "09/17", title: "あまてくアイディアソン feat. ベガコーポレーション", location: "TOMOSUBA 京都河原町店", image: "path/to/image3.png" },
-    { date: "09/18", title: "あまてくアイディアソン feat. ベガコーポレーション", location: "TOMOSUBA 京都河原町店", image: "path/to/image3.png" },
+    { date: "4月", title: "新歓祭", image: "/about/state2.jpg" },
+    { date: "6月", title: "新入生歓迎コンパ", image: "/about/state_board.jpg" },
+    { date: "8月", title: "制作合宿(夏)", image: "/about/state2.jpg" },
+    { date: "8月", title: "夏合宿（旅行）", image: "/about/state2.jpg" },
+    { date: "9月", title: "サタデー　　　　　　ジャンボリー", image: "/about/state2.jpg" },
+    { date: "11月", title: "神山祭", image: "/about/state2.jpg" },
+    { date: "12月", title: "4回生追い出しコンパ", image: "/about/state2.jpg" },
+    { date: "2月", title: "春合宿/制作合宿（春）",  image: "/about/state2.jpg" },
 ];
+// カードサイズとレスポンシブ対応を考慮したフック
+const useRowSize = (): number => {
+    const getRowSize = (): number => {
+        const rootStyles = getComputedStyle(document.documentElement);
+        const rowSize = rootStyles.getPropertyValue('--row-size').trim();
+        return parseInt(rowSize, 10) || 3;
+    };
 
-const ROW_SIZE = 3; // PCでの1行のカード数
+    const [rowSize, setRowSize] = useState<number>(getRowSize());
 
-const TimelineItem = ({ date, title, location, image }: EventData) => (
-    <div className="timeline-item">
-        <div className="timeline-content">
-            <div className="timeline-date">{date}</div>
-            <div className="timeline-title">{title}</div>
-            <div className="timeline-location">{location}</div>
-            {image && <img src={image} alt={title} className="timeline-image" />}
+    useEffect(() => {
+        const handleResize = () => {
+            setRowSize(getRowSize());
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return rowSize;
+};
+
+const TimelineItem = ({ date, title,image }: EventData) => {
+    const backgroundStyle = image
+        ? {
+            backgroundImage: `url(${image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+        }
+        : {};
+
+    return (
+
+        <div className="timeline-item" style={backgroundStyle}>
+            <div className="overlay z-0"></div>
+            <div className="timeline-content z-50">
+                <div className="timeline-date font-zen-kurenaido text-color text-2xl">{date}</div>
+                <div className="timeline-title font-zen-kurenaido text-color text-3xl">{title}</div>
+            </div>
         </div>
-    </div>
-);
 
-const Timeline = ({ events }: { events: EventData[] }) => {
+    );
+};
+
+
+const Timeline = ({events}: { events: EventData[] }) => {
     // 改行ごとに順序と配置を決定
     const rows = [];
+    const ROW_SIZE = useRowSize();
     for (let i = 0; i < events.length; i += ROW_SIZE) {
         const row = events.slice(i, i + ROW_SIZE);
         const rowIndex = Math.floor(i / ROW_SIZE);
         const isRight = rowIndex % 2 === 1; // 偶数行（0,2,4,...)を左寄せ、奇数行を右寄せ
         if (isRight) row.reverse(); // 右寄せの行はカードを逆順に
-        rows.push({ row, isRight });
+        rows.push({row, isRight});
     }
 
     return (
@@ -54,10 +86,10 @@ const Timeline = ({ events }: { events: EventData[] }) => {
                     {rowData.row.map((event, index) => (
                         <React.Fragment key={index}>
                             <TimelineItem {...event} />
-                            {index < rowData.row.length - 1 && <div className="connector-horizontal" />}
+                            {index < rowData.row.length - 1 && <div className="connector-horizontal connector-color-dark" />}
                         </React.Fragment>
                     ))}
-                    {rowIndex < rows.length - 1 && <div className="connector-vertical" />}
+                    {rowIndex < rows.length - 1 && <div className="connector-vertical connector-color-dark" />}
                 </div>
             ))}
         </div>

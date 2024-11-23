@@ -10,7 +10,7 @@
   --header-background-color: #ffffff;
   --footer-background-color: #ffffff;
   --link-hover-color: #00afff;
-  --blue-color: #7dd3fc;
+  --blue-color: #c8eeff;
   --blue-color-alt: #7dd3fc;
   --text-color: #3b3b3b;
   --hover-color: #00afff;
@@ -19,6 +19,8 @@
   --x-icon-filter: none;
   --menu-border-color: #505050;
   --over-lay:rgba(255, 255, 255, 0.9);
+  --card: #ffffff;
+  --box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
 }
 
 .dark-mode {
@@ -26,7 +28,7 @@
   --header-background-color: #232323;
   --link-hover-color: #ffcc99;
   --footer-background-color: #2b2b2b;
-  --blue-color: #313131;
+  --blue-color: #ffb75d;
   --blue-color-alt: #ffb75d;
   --text-color: #ffffff;
   --hover-color: #ffcc99;
@@ -35,6 +37,8 @@
   --menu-border-color: #888888;
   --x-icon-filter: invert(1);
   --over-lay:rgba(255, 255, 255, 0);
+  --card: #252525;
+  --box-shadow: 0 3px 5px rgba(0, 0, 0, 1);
 }
 
 
@@ -57,8 +61,8 @@ a:hover {
 }
 
 
-.text-color-dark {
-    color: var(--blue-color-alt);
+.connector-color-dark {
+    background-color: var(--blue-color);
 }
 
 .border-color-dark{
@@ -77,6 +81,10 @@ a:hover {
   filter: var(--x-icon-filter);
 }
 
+.timeline-item {
+  background-color: var(--card);
+  box-shadow: var(--box-shadow);
+}
 
 
 .nextButton:hover {

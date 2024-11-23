@@ -29,7 +29,7 @@ const Gallery = () => {
     const image = images[currentIndex];
 
     return (
-        <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-screen flex items-center justify-center overflow-hidden ">
             <AnimatePresence mode="wait">
                 {image && (
                     <motion.img
