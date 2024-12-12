@@ -13,7 +13,7 @@ const events: EventData[] = [
     { date: "6月", title: "新入生歓迎コンパ", image: "/about/state_board.jpg" },
     { date: "8月", title: "制作合宿(夏)", image: "/about/state2.jpg" },
     { date: "8月", title: "夏合宿（旅行）", image: "/about/state2.jpg" },
-    { date: "9月", title: "サタデー　　　　　　ジャンボリー", image: "/about/state2.jpg" },
+    { date: "9月", title: "サタデージャンボリー", image: "/about/state2.jpg" },
     { date: "11月", title: "神山祭", image: "/about/state2.jpg" },
     { date: "12月", title: "4回生追い出しコンパ", image: "/about/state2.jpg" },
     { date: "2月", title: "春合宿/制作合宿（春）",  image: "/about/state2.jpg" },
