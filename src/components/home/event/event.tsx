@@ -21,6 +21,9 @@ const events: EventData[] = [
 // カードサイズとレスポンシブ対応を考慮したフック
 const useRowSize = (): number => {
     const getRowSize = (): number => {
+        if (typeof window === 'undefined' || !document.documentElement) {
+            return 3; // SSR環境ではデフォルト値を返す
+        }
         const rootStyles = getComputedStyle(document.documentElement);
         const rowSize = rootStyles.getPropertyValue('--row-size').trim();
         return parseInt(rowSize, 10) || 3;
