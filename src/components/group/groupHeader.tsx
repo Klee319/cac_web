@@ -1,5 +1,5 @@
 "use client";
-import {useState} from "react";
+import { useState } from "react";
 import Image from "next/image";
 // @ts-ignore
 import cacLogo from '../../../public/logo/newCAC.png';
@@ -7,8 +7,10 @@ import SwitchLightDark from "@/components/main/switchLightDark";
 
 export default function GroupHeader() {
     const [isMenuOpen, setIsMenuOpen] = useState(false); // メニューの開閉状態
+    const [isDarkMode, setIsDarkMode] = useState(true);   // ダークモードの状態
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // メニューの開閉をトグル
+    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);    // メニューの開閉をトグル
+    const toggleMode = () => setIsDarkMode(prev => !prev);   // ダークモードの切替
 
     return (
         <>
@@ -19,7 +21,7 @@ export default function GroupHeader() {
                     <div className="flex items-center space-x-4">
                         <Image src={cacLogo} alt="C.A.C. logo" style={{ width: 100, height: 'auto' }} className="block" />
                         <div className="text-1xl font-moon">
-                            <SwitchLightDark  isDarkMode/>
+                            <SwitchLightDark isDarkMode={isDarkMode} toggleMode={toggleMode} />
                         </div>
                     </div>
 
@@ -56,9 +58,9 @@ export default function GroupHeader() {
                 className={`absolute top-[85px] right-0 w-full shadow-lg z-40 transition-transform duration-300 ease-in-out overflow-hidden menu-bar ${
                     isMenuOpen ? "translate-y-0" : "-translate-y-full"
                 }`}
-                style={{ width:200 }} // ヘッダーの高さを引いた高さを設定
+                style={{ width: 200 }} // ヘッダーの高さを引いた高さを設定
             >
-                <nav className="p-4 text-center ">
+                <nav className="p-4 text-center">
                     {["Programing", "Graphic", "Music", "CG", "Video", "Scenario"].map((item, index) => (
                         <div key={index} className="flex flex-col">
                             <hr className="border-t border-gray-300" />

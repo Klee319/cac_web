@@ -7,6 +7,8 @@
     }
 }
 
+
+
 /* スマホより大きい（小さめ表示)*/
 @media (min-width: 428px) {
     .cac-logo{
@@ -53,8 +55,4 @@
     .header{
         display: none;
     }
-}
-
-.cac-logo{
-    user-select: none;
 }
