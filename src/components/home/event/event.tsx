@@ -102,10 +102,14 @@ const Timeline = ({ events }: { events: EventData[] }) => {
         let adjustmentInterval: NodeJS.Timeout | null = null;
         
         // モバイルデバイスかどうかを判定
-        // スマホを横に向けた時（高さが428px以下）はPC版の調整ロジックを適用する
+        // スマホを横に向けた時（高さが428px以下）とタブレットの縦向き表示の時はPC版の調整ロジックを適用する
         const isMobile = () => {
             // スマホを横に向けた時はPC版の調整ロジックを適用
             if (window.innerHeight <= 428) {
+                return false;
+            }
+            // タブレットの縦向き表示の時はPC版の調整ロジックを適用
+            if (window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth < window.innerHeight) {
                 return false;
             }
             // それ以外はこれまで通りの判定

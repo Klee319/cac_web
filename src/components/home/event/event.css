@@ -186,7 +186,31 @@ body{
 /* タブレット用（縦向き表示の時） */
 @media (max-width:1280px) and (min-height:768px) and (orientation: portrait) {
     :root {
-        --row-size: 2;
+        --row-size: 3; /* PC版と同じ行サイズに設定 */
+    }
+    
+    /* カード */
+    .timeline-item {
+        border-radius: 30px;
+        width: 25vw; /* タブレット用に調整 */
+        height: 20vw; /* タブレット用に調整 */
+        text-align: center;
+        position: relative;
+        margin: 0 10px;
+    }
+    
+    /* コネクタ（水平線） */
+    .connector-horizontal {
+        height: 1.5vh;
+        width: 10vw; /* タブレット用に調整 */
+        border-radius: 6px;
+    }
+    
+    .timeline-date{
+        font-size: 2vw; /* タブレット用に調整 */
+    }
+    .timeline-title{
+        font-size: 2.5vw; /* タブレット用に調整 */
     }
 }
 

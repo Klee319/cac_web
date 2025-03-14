@@ -339,24 +339,153 @@ body{
 
 /* タブレット用（縦向き表示の時） */
 @media (max-width:1280px) and (min-height:768px) and (orientation: portrait) {
-    .welcome {
-        height: 60svh;
+    /* Google用のスタイル */
+    .google .welcome {
+        height: calc(var(--vh)*100);
+        overflow: visible;
     }
 
-    .cac-cat {
+    /* メインの猫 */
+    .google .cac-cat-main {
         position: absolute;
-        top: 7svh;
-        margin-left: 7vw;
-        height: 35svh;
+        top: calc(var(--vh)*60);
+        left: 60vw;
+        height: calc(var(--vh)*45);
         width: auto;
-
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
     }
 
-    .cac-logoL {
+    /* 看板 - メインの猫との相対位置を保持 */
+    .google .cac-board {
         position: absolute;
-        bottom: 5svh;
-        height: 10svh;
         width: auto;
+        height: calc(var(--vh)*25);
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    /* 左側の猫 */
+    .google .catA {
+        width: auto;
+        height: calc(var(--vh)*30);
+        position: absolute;
+        right: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    /* 右側の猫 */
+    .google .catB {
+        width: auto;
+        height: calc(var(--vh)*40);
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    /* スポットライト */
+    .google .spotlightL {
+        position: absolute;
+        left: 5vw;
+        height: calc(var(--vh)*20);
+        width: calc(var(--vh)*20);
+    }
+
+    .google .spotlightR {
+        position: absolute;
+        right: 5vw;
+        height: calc(var(--vh)*20);
+        width: calc(var(--vh)*20);
+    }
+
+    .google .cac-logoL {
+        position: absolute;
+        top: calc(var(--vh)*85);
+        height: calc(var(--vh)*13);
+        width: auto;
+        z-index: 3;
+        left: 55vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    /* Safari用のスタイル */
+    .safari .welcome {
+        height: 100svh;
+        overflow: visible;
+    }
+
+    .safari .cac-cat-main {
+        position: absolute;
+        top: 60svh;
+        left: 60vw;
+        height: 45svh;
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
+
+    .safari .cac-board {
+        position: absolute;
+        width: auto;
+        height: 25svh;
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    .safari .catA {
+        width: auto;
+        height: 30svh;
+        position: absolute;
+        right: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .safari .catB {
+        width: auto;
+        height: 40svh;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .safari .spotlightL {
+        position: absolute;
+        left: 5vw;
+        height: 20svh;
+        width: 20svh;
+    }
+
+    .safari .spotlightR {
+        position: absolute;
+        right: 5vw;
+        height: 20svh;
+        width: 20svh;
+    }
+
+    .safari .cac-logoL {
+        position: absolute;
+        top: 85svh;
+        height: 13svh;
+        width: auto;
+        z-index: 3;
+        left: 55vw;
+        transform: translateX(-50%);
         display: block !important;
         visibility: visible !important;
     }
