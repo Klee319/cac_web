@@ -193,7 +193,7 @@ body{
 /* スマホ（横向き表示の時（高さ不足）) */
 @media (max-height: 428px){
     :root {
-        --row-size: 2;
+        --row-size: 3; /* PC版と同じ行サイズに設定 */
     }
     
     /* カード */

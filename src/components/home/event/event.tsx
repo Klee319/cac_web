@@ -102,7 +102,15 @@ const Timeline = ({ events }: { events: EventData[] }) => {
         let adjustmentInterval: NodeJS.Timeout | null = null;
         
         // モバイルデバイスかどうかを判定
-        const isMobile = () => window.innerWidth <= 1024;
+        // スマホを横に向けた時（高さが428px以下）はPC版の調整ロジックを適用する
+        const isMobile = () => {
+            // スマホを横に向けた時はPC版の調整ロジックを適用
+            if (window.innerHeight <= 428) {
+                return false;
+            }
+            // それ以外はこれまで通りの判定
+            return window.innerWidth <= 1024;
+        };
         
         // 縦線の位置を調整する関数
         const adjustVerticalConnectors = () => {
