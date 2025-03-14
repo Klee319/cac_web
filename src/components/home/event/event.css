@@ -84,18 +84,23 @@ body{
     height: 15vh;
     top: 100%; /* 行の下に配置 */
     border-radius: 3px;
+    transform: translateY(-1px); /* 線が途切れないように微調整 */
+    will-change: transform, height, left; /* 変更される可能性のあるプロパティを最適化 */
+    transition: height 0.2s ease-out, left 0.2s ease-out; /* 高さと位置の変更をスムーズに */
+    z-index: 1; /* 他の要素より前面に表示 */
+    min-height: 10px; /* 最小の高さを設定 */
 }
 
 /* 左寄せの縦線位置 */
 .timeline-row.left .connector-vertical {
-    left: 100%; /* カードの右端に配置 */
-    margin-left: -10.5vw; /* 線が途切れないように微調整 */
+    left: 50%; /* カードの中央に配置 */
+    transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
 }
 
 /* 右寄せの縦線位置 */
 .timeline-row.right .connector-vertical {
-    left: 0; /* カードの左端に配置 */
-    margin-left: 9.5vw; /* 線が途切れないように微調整 */
+    left: 50%; /* カードの中央に配置 */
+    transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
 }
 
 /*スマホ*/
@@ -141,17 +146,21 @@ body{
         height: 15vh;
         top: 100%; /* 行の下に配置 */
         border-radius: 3px;
+        will-change: transform, height, left; /* 変更される可能性のあるプロパティを最適化 */
+        transition: height 0.2s ease-out, left 0.2s ease-out; /* 高さと位置の変更をスムーズに */
+        z-index: 1; /* 他の要素より前面に表示 */
+        min-height: 10px; /* 最小の高さを設定 */
     }
     /* 左寄せの縦線位置 */
     .timeline-row.left .connector-vertical {
-        left: 100%; /* カードの右端に配置 */
-        margin-left: -40vw; /* 線が途切れないように微調整 */
+        left: 50%; /* カードの中央に配置 */
+        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
     }
 
     /* 右寄せの縦線位置 */
     .timeline-row.right .connector-vertical {
-        left: 0; /* カードの左端に配置 */
-        margin-left: 40vw; /* 線が途切れないように微調整 */
+        left: 50%; /* カードの中央に配置 */
+        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
     }
     .timeline-date{
         font-size: 3.5vw;
@@ -206,14 +215,22 @@ body{
     
     /* 左寄せの縦線位置 */
     .timeline-row.left .connector-vertical {
-        left: 100%; /* カードの右端に配置 */
-        margin-left: -15vw; /* 線が途切れないように微調整 */
+        left: 50%; /* カードの中央に配置 */
+        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
     }
     
     /* 右寄せの縦線位置 */
     .timeline-row.right .connector-vertical {
-        left: 0; /* カードの左端に配置 */
-        margin-left: 15vw; /* 線が途切れないように微調整 */
+        left: 50%; /* カードの中央に配置 */
+        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
+    }
+    
+    /* コネクタ（縦線）の最適化 */
+    .connector-vertical {
+        will-change: transform, height, left; /* 変更される可能性のあるプロパティを最適化 */
+        transition: height 0.2s ease-out, left 0.2s ease-out; /* 高さと位置の変更をスムーズに */
+        z-index: 1; /* 他の要素より前面に表示 */
+        min-height: 10px; /* 最小の高さを設定 */
     }
     
     .timeline-date{
