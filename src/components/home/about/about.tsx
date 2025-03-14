@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import "./about.css";
+
+// 各ページの説明文データ
 const descriptions = [
     {
         title: "デジタル系創作団体",
@@ -18,10 +20,6 @@ const descriptions = [
             "専攻している分野に分かれた「班」システムを採用。",
             "同じ専攻の仲間と協力することでさらに技術や知識に磨きがかかります。技術習得のために欲しかった書籍を買ってもらえることも...",
             "班の種類と班ごとの詳しい概要は「GROUP」で確認できます。"
-
-
-
-
         ],
     },
     {
@@ -50,22 +48,24 @@ const descriptions = [
     },
 ];
 
-const variants = {
-    enter: (direction: number) => ({
-        x: direction > 0 ? 100 : -100,
-        opacity: 0,
-    }),
-    center: { x: 0, opacity: 1 },
-    exit: (direction: number) => ({
-        x: direction < 0 ? 100 : -100,
-        opacity: 0,
-    }),
-};
-
 export default function About() {
     const [pageIndex, setPageIndex] = useState(0);
     const [direction, setDirection] = useState(1);
 
+    // アニメーションのバリアント定義
+    const variants = {
+        enter: (direction: number) => ({
+            x: direction > 0 ? 100 : -100,
+            opacity: 0,
+        }),
+        center: { x: 0, opacity: 1 },
+        exit: (direction: number) => ({
+            x: direction < 0 ? 100 : -100,
+            opacity: 0,
+        }),
+    };
+
+    // 次のページへ移動
     const nextPage = () => {
         setDirection(1);
         setPageIndex((prevIndex) =>
@@ -73,6 +73,7 @@ export default function About() {
         );
     };
 
+    // 前のページへ移動
     const prevPage = () => {
         setDirection(-1);
         setPageIndex((prevIndex) =>
@@ -87,9 +88,7 @@ export default function About() {
                 <p className="pb-2">C.A.C.について</p>
                 <div className="w-1/3 mx-auto h-0.5 border-color-dark mb-10"></div>
             </div>
-
             <div className="pt-8 flex items-center justify-between flex-row about-content">
-
                 {/* 画像部分 */}
                 <div className="mt-8 md:mt-0 items center about-image">
                     <Image
@@ -97,10 +96,9 @@ export default function About() {
                         alt="作業風景"
                         width={520}
                         height={490}
-                        className="object-contain "
+                        className="object-contain"
                     />
                 </div>
-
                 {/* テキスト部分 */}
                 <div className="flex flex-row items-center justify-between about-text">
                     <div
@@ -109,8 +107,7 @@ export default function About() {
                     >
                         &#60;
                     </div>
-
-                    <div className="relative w-[85%] ">
+                    <div className="relative w-[85%]">
                         <AnimatePresence initial={false} custom={direction} mode="wait">
                             <motion.div
                                 key={pageIndex}
@@ -135,7 +132,6 @@ export default function About() {
                             </motion.div>
                         </AnimatePresence>
                     </div>
-
                     <div
                         onClick={nextPage}
                         className="text-4xl cursor-pointer nextButton"
@@ -143,9 +139,7 @@ export default function About() {
                         &#62;
                     </div>
                 </div>
-
             </div>
         </div>
-
     );
 }

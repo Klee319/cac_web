@@ -1,13 +1,11 @@
-import Image from "next-image-export-optimizer"
-import insragramSvg from '../../../public/logo/Instagram_logo_2016.svg'
-import XSvg from "../../../public/logo/X_logo_2023.svg"
-import "./footer.css"
+import Image from "next/image";
+import insragramSvg from '../../../public/logo/Instagram_logo_2016.svg';
+import XSvg from "../../../public/logo/X_logo_2023.svg";
+import "./footer.css";
+
 export default function Footer() {
     return (
         <footer className="pb-4 pt-4">
-            {/* 境界線 */}
-            <div className="flex items-center justify-center">
-            </div>
             {/* フッターのメイン部分 */}
             <div className="flex flex-row items-center justify-around space-y-0">
                 {/* ロゴとタイトル */}
@@ -24,14 +22,14 @@ export default function Footer() {
 
                 {/* ソーシャルリンク */}
                 <div className="flex items-center social">
-                    <div className="flex">
-                        <a href="https://www.instagram.com/c_a_c_official">
+                    <div className="flex flex-row items-center mr-4">
+                        <a href="https://www.instagram.com/c_a_c_official" className="mr-4">
                             <Image
                                 src={insragramSvg}
                                 alt="Instagram"
                                 width={40}
                                 height={40}
-                                className="scale-100 hover:scale-125 transition-transform insta-logo mr-4"
+                                className="scale-100 hover:scale-125 transition-transform insta-logo"
                             />
                         </a>
                         <a href="https://twitter.com/c_a_c_official">

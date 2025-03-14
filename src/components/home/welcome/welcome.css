@@ -102,47 +102,154 @@ body{
 @media (max-width: 428px) {
     .google .welcome {
         height: calc(var(--vh)*100);
-
+        overflow: visible;
     }
 
-    .google .cac-cat {
-        position: absolute ;
-        top:  calc(var(--vh)*15);
-        margin-left: 20vw;
-        height:  calc(var(--vh)*60);
-        width:auto;
+    /* メインの猫 */
+    .google .cac-cat-main {
+        position: absolute;
+        top: calc(var(--vh)*60);
+        left: 60vw;
+        height: calc(var(--vh)*45);
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
 
+    /* 看板 - メインの猫との相対位置を保持 */
+    .google .cac-board {
+        position: absolute;
+        width: auto;
+        height: calc(var(--vh)*25);
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    /* 左側の猫 */
+    .google .catA {
+        width: auto;
+        height: calc(var(--vh)*30);
+        position: absolute;
+        right: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    /* 右側の猫 */
+    .google .catB {
+        width: auto;
+        height: calc(var(--vh)*40);
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    /* スポットライト */
+    .google .spotlightL {
+        position: absolute;
+        left: 5vw;
+        height: calc(var(--vh)*20);
+        width: calc(var(--vh)*20);
+    }
+
+    .google .spotlightR {
+        position: absolute;
+        right: 5vw;
+        height: calc(var(--vh)*20);
+        width: calc(var(--vh)*20);
     }
 
     .google .cac-logoL {
         position: absolute;
-        bottom:  calc(var(--vh)*5);
-        height:  calc(var(--vh)*13);
+        top: calc(var(--vh)*85);
+        height: calc(var(--vh)*13);
         width: auto;
+        z-index: 3;
+        left: 55vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
     }
 
+    /* Safari用のスタイル */
     .safari .welcome {
         height: 100svh;
+        overflow: visible;
     }
 
-    .safari .cac-cat {
-        position: absolute ; /* レイアウト調整 */
-        top: 12svh;
-        margin-left: 20vw;
-        height: 60vh;
+    .safari .cac-cat-main {
+        position: absolute;
+        top: 60svh;
+        left: 60vw;
+        height: 45svh;
         width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
 
+    .safari .cac-board {
+        position: absolute;
+        width: auto;
+        height: 25svh;
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    .safari .catA {
+        width: auto;
+        height: 30svh;
+        position: absolute;
+        right: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .safari .catB {
+        width: auto;
+        height: 40svh;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .safari .spotlightL {
+        position: absolute;
+        left: 5vw;
+        height: 20svh;
+        width: 20svh;
+    }
+
+    .safari .spotlightR {
+        position: absolute;
+        right: 5vw;
+        height: 20svh;
+        width: 20svh;
     }
 
     .safari .cac-logoL {
         position: absolute;
-        bottom: 5svh;
+        top: 85svh;
         height: 13svh;
         width: auto;
+        z-index: 3;
+        left: 55vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
     }
-
 }
-
 
 
 /* 横向き(Googleからのスマホ・タブレットアクセスを除く)*/
@@ -182,6 +289,8 @@ body{
         z-index: 3;
         transform: translate(-50%, -50%);
         user-select: none;
+        display: block !important;
+        visibility: visible !important;
     }
 
     /* キャラクターのスタイル */
@@ -248,6 +357,8 @@ body{
         bottom: 5svh;
         height: 10svh;
         width: auto;
+        display: block !important;
+        visibility: visible !important;
     }
 }
 
@@ -256,23 +367,125 @@ body{
 @media (max-height: 428px){
     .google .welcome {
         height: calc(var(--vh)*100);
-
+        overflow: visible;
     }
 
-    .google .cac-cat {
-        position: absolute ;
-        top:  calc(var(--vh)*5);
-        margin-left: 5vw;
-        height:  calc(var(--vh)*65);
-        width:auto;
+    /* メインの猫 */
+    .google .cac-cat-main {
+        position: absolute;
+        top: 45vh;
+        left: 52vw;
+        height: 65vh;
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
 
+    /* 看板 - メインの猫との相対位置を保持 */
+    .google .cac-board {
+        position: absolute;
+        width: auto;
+        height: 35vh;
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    /* 左側の猫 */
+    .google .catA {
+        width: auto;
+        height: 50vh;
+        position: absolute;
+        right: 6vw;
+        top: -20vh;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    /* 右側の猫 */
+    .google .catB {
+        width: auto;
+        height: 80vh;
+        position: absolute;
+        left: 4vw;
+        top: -30vh;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
     }
 
     .google .cac-logoL {
         position: absolute;
-        bottom:  calc(var(--vh)*5);
-        height:  calc(var(--vh)*20);
+        top: calc(var(--vh)*80);
+        height: calc(var(--vh)*15);
         width: auto;
+        z-index: 3;
+        left: 50vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    /* Safari用のスタイル */
+    .safari .welcome {
+        height: 100svh;
+        overflow: visible;
+    }
+
+    .safari .cac-cat-main {
+        position: absolute;
+        top: 45svh;
+        left: 52vw;
+        height: 65svh;
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
+
+    .safari .cac-board {
+        position: absolute;
+        width: auto;
+        height: 35svh;
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    .safari .catA {
+        width: auto;
+        height: 50svh;
+        position: absolute;
+        right: 6vw;
+        top: -20svh;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .safari .catB {
+        width: auto;
+        height: 80svh;
+        position: absolute;
+        left: 4vw;
+        top: -30svh;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .safari .cac-logoL {
+        position: absolute;
+        top: 80svh;
+        height: 15svh;
+        width: auto;
+        z-index: 3;
+        left: 50vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
     }
 }
 
@@ -280,22 +493,123 @@ body{
 @media (min-width:1024px) and (max-height:960px) and (orientation: landscape) {
     .tablet.google .welcome {
         height: calc(var(--vh)*100);
+        overflow: visible;
     }
 
-    .tablet.google .cac-cat {
+    /* メインの猫 */
+    .tablet.google .cac-cat-main {
         position: absolute;
-        top: calc(var(--vh)*10);
-        margin-left: 5vw;
-        height: calc(var(--vh)*65);
+        top: calc(var(--vh)*45);
+        left: 52vw;
+        height: calc(var(--vh)*55);
         width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
 
+    /* 看板 - メインの猫との相対位置を保持 */
+    .tablet.google .cac-board {
+        position: absolute;
+        width: auto;
+        height: calc(var(--vh)*30);
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    /* 左側の猫 */
+    .tablet.google .catA {
+        width: auto;
+        height: calc(var(--vh)*35);
+        position: absolute;
+        right: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    /* 右側の猫 */
+    .tablet.google .catB {
+        width: auto;
+        height: calc(var(--vh)*45);
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
     }
 
     .tablet.google .cac-logoL {
         position: absolute;
         bottom: calc(var(--vh)*5);
-        height: calc(var(--vh)*20);
+        height: calc(var(--vh)*18);
         width: auto;
+        z-index: 3;
+        left: 50vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    /* Safari用のスタイル */
+    .tablet.safari .welcome {
+        height: 100svh;
+        overflow: visible;
+    }
+
+    .tablet.safari .cac-cat-main {
+        position: absolute;
+        top: 45svh;
+        left: 52vw;
+        height: 55svh;
+        width: auto;
+        z-index: 3;
+        transform: translate(-50%, -50%);
+        user-select: none;
+    }
+
+    .tablet.safari .cac-board {
+        position: absolute;
+        width: auto;
+        height: 30svh;
+        z-index: 4;
+        transform-origin: center bottom;
+        user-select: none;
+    }
+
+    .tablet.safari .catA {
+        width: auto;
+        height: 35svh;
+        position: absolute;
+        right: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .tablet.safari .catB {
+        width: auto;
+        height: 45svh;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 3;
+        transform-origin: bottom center;
+        user-select: none;
+    }
+
+    .tablet.safari .cac-logoL {
+        position: absolute;
+        bottom: 5svh;
+        height: 18svh;
+        width: auto;
+        z-index: 3;
+        left: 50vw;
+        transform: translateX(-50%);
+        display: block !important;
+        visibility: visible !important;
     }
 }
 

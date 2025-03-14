@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from "react";
 import Image from "next/image";
 import "./homeHeader.css";
 import SwitchLightDark from '../../main/switchLightDark';
@@ -8,6 +8,9 @@ type Props = {
     toggleMode: () => void;
 };
 
+// メニューアイテムの定義
+const MENU_ITEMS = ["Welcome", "About", "Group", "Location & Dates", "Event", "Gallery"];
+
 export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
     const [isMenuOpen, setIsMenuOpen] = useState(false); // メニューの開閉状態
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // メニューの開閉をトグル
@@ -15,9 +18,13 @@ export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
         setIsMenuOpen(false); // メニューを閉じる
     };
 
+    // URLハッシュに変換する関数
+    const getUrlHash = (item: string) => {
+        return `#${item.toLowerCase().replace(/ & /g, "-").replace(/\s+/g, "")}`;
+    };
+
     return (
         <>
-
             {/* ヘッダー */}
             <div className="fixed w-full top-0 left-0 p-3 shadow-md z-50 header">
                 <div className="flex items-center justify-between">
@@ -26,17 +33,16 @@ export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
                         <div className="cac-logo h-auto w-[80px]">
                             <Image
                                 src="/logo/newCAC.png"
-                                  alt="C.A.C. ロゴ"
-                                  width={460}
-                                  height={192}
-                                   className="block"
+                                alt="C.A.C. ロゴ"
+                                width={460}
+                                height={192}
+                                className="block"
                             />
                         </div>
                         <div className="dark-switch text-left text-[12px] font-moon pt-1">
                             <SwitchLightDark isDarkMode={isDarkMode} toggleMode={toggleMode} />
                         </div>
                     </div>
-
                     {/* ハンバーガーメニューアイコン (スマホ用) */}
                     <div className="xl:hidden">
                         <button onClick={toggleMenu} aria-label="Open Menu" className="relative z-50">
@@ -48,24 +54,28 @@ export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
                                 stroke="currentColor"
                                 className="w-8 h-8 hamburger-icon"
                             >
-                                <path strokeLinecap="round" strokeLinejoin="round"
-                                      d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+                                />
                             </svg>
                         </button>
                     </div>
-
                     {/* PC用ナビゲーションリンク */}
-                    <nav className="nav-bar hidden space-x-8 text-2xl font-moon ">
-                        <a href="#welcome" className="hover:text-link-hover-color">Welcome</a>
-                        <a href="#about" className="hover:text-link-hover-color">About</a>
-                        <a href="#group" className="hover:text-link-hover-color">Group</a>
-                        <a href="#location" className="hover:text-link-hover-color">Location & Dates</a>
-                        <a href="#event" className="hover:text-link-hover-color">Event</a>
-                        <a href="#gallery" className="hover:text-link-hover-color">Gallery</a>
+                    <nav className="nav-bar hidden space-x-8 text-2xl font-moon">
+                        {MENU_ITEMS.map((item) => (
+                            <a
+                                key={item}
+                                href={getUrlHash(item)}
+                                className="hover:text-link-hover-color"
+                            >
+                                {item}
+                            </a>
+                        ))}
                     </nav>
                 </div>
             </div>
-
             {/* メニュー */}
             <div
                 className={`menu-bar top-[40px] fixed right-0 shadow-lg z-40 transition-all duration-300 ease-in-out overflow-hidden p-1 ${
@@ -78,11 +88,10 @@ export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
                 }}
             >
                 <nav className="p-4 text-center font-moon">
-                    {["Welcome", "About", "Group", "Location & Dates", "Event", "Gallery"].map((item, index) => (
+                    {MENU_ITEMS.map((item, index) => (
                         <div key={index} className="flex flex-col">
-
                             <a
-                                href={`#${item.toLowerCase().replace(/ & /g, "-").replace(/\s+/g, "")}`}
+                                href={getUrlHash(item)}
                                 className="block text-lg py-4"
                                 onClick={handleLinkClick}
                             >
@@ -96,5 +105,4 @@ export default function HomeHeader({ isDarkMode, toggleMode }: Props) {
         </>
     );
 }
-
 

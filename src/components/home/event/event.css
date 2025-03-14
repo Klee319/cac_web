@@ -183,9 +183,44 @@ body{
 
 /* スマホ（横向き表示の時（高さ不足）) */
 @media (max-height: 428px){
-
     :root {
         --row-size: 2;
+    }
+    
+    /* カード */
+    .timeline-item {
+        border-radius: 30px;
+        width: 30vw;
+        height: 25vw;
+        text-align: center;
+        position: relative;
+        margin: 0 10px;
+    }
+    
+    /* コネクタ（水平線） */
+    .connector-horizontal {
+        height: 1.5vh;
+        width: 8vw;
+        border-radius: 6px;
+    }
+    
+    /* 左寄せの縦線位置 */
+    .timeline-row.left .connector-vertical {
+        left: 100%; /* カードの右端に配置 */
+        margin-left: -15vw; /* 線が途切れないように微調整 */
+    }
+    
+    /* 右寄せの縦線位置 */
+    .timeline-row.right .connector-vertical {
+        left: 0; /* カードの左端に配置 */
+        margin-left: 15vw; /* 線が途切れないように微調整 */
+    }
+    
+    .timeline-date{
+        font-size: 2vw;
+    }
+    .timeline-title{
+        font-size: 2.5vw;
     }
 }
 

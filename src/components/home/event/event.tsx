@@ -8,52 +8,61 @@ type EventData = {
     image?: string;
 };
 
+// イベントデータ
 const events: EventData[] = [
     { date: "4月", title: "新歓祭", image: "/about/state2.jpg" },
     { date: "6月", title: "新入生歓迎コンパ", image: "/about/state_board.jpg" },
     { date: "8月", title: "制作合宿(夏)", image: "/about/state2.jpg" },
     { date: "8月", title: "夏合宿（旅行）", image: "/about/state2.jpg" },
-    { date: "9月", title: "サタデー　　　　　　ジャンボリー", image: "/about/state2.jpg" },
+    { date: "9月", title: "サタデージャンボリー", image: "/about/state2.jpg" },
     { date: "11月", title: "神山祭", image: "/about/state2.jpg" },
     { date: "12月", title: "4回生追い出しコンパ", image: "/about/state2.jpg" },
-    { date: "2月", title: "春合宿/制作合宿（春）",  image: "/about/state2.jpg" },
+    { date: "2月", title: "春合宿/制作合宿（春）", image: "/about/state2.jpg" },
 ];
 
 // カードサイズとレスポンシブ対応を考慮したフック
 const useRowSize = (): number => {
+    // サーバーサイドレンダリング対応のためのデフォルト値
+    const DEFAULT_ROW_SIZE = 3;
+    
+    // CSSカスタムプロパティから行サイズを取得する関数
     const getRowSize = (): number => {
-        // サーバーサイドの場合はwindowがないため、デフォルト値を返す
-        if (typeof window === "undefined" || typeof getComputedStyle !== "function") {
-            return 3;
+        if (typeof window === "undefined") return DEFAULT_ROW_SIZE;
+        
+        try {
+            const rowSize = getComputedStyle(document.documentElement)
+                .getPropertyValue('--row-size')
+                .trim();
+            return parseInt(rowSize, 10) || DEFAULT_ROW_SIZE;
+        } catch {
+            return DEFAULT_ROW_SIZE;
         }
-        const rootStyles = getComputedStyle(document.documentElement);
-        const rowSize = rootStyles.getPropertyValue('--row-size').trim();
-        return parseInt(rowSize, 10) || 3;
     };
 
-    const [rowSize, setRowSize] = useState<number>(getRowSize());
+    const [rowSize, setRowSize] = useState<number>(DEFAULT_ROW_SIZE);
 
     useEffect(() => {
-        const handleResize = () => {
-            setRowSize(getRowSize());
-        };
-
+        // クライアントサイドでのみ実行
+        setRowSize(getRowSize());
+        
+        const handleResize = () => setRowSize(getRowSize());
         window.addEventListener('resize', handleResize);
+        
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
     return rowSize;
 };
 
+// タイムラインの各アイテム（イベントカード）
 const TimelineItem = ({ date, title, image }: EventData) => {
-    const backgroundStyle = image
-        ? {
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-        }
-        : {};
+    // 背景画像のスタイル（画像がある場合のみ設定）
+    const backgroundStyle = image ? {
+        backgroundImage: `url(${image})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+    } : {};
 
     return (
         <div className="timeline-item" style={backgroundStyle}>
@@ -66,17 +75,23 @@ const TimelineItem = ({ date, title, image }: EventData) => {
     );
 };
 
+// タイムラインコンポーネント
 const Timeline = ({ events }: { events: EventData[] }) => {
-    // 改行ごとに順序と配置を決定
-    const rows = [];
     const ROW_SIZE = useRowSize();
-    for (let i = 0; i < events.length; i += ROW_SIZE) {
-        const row = events.slice(i, i + ROW_SIZE);
-        const rowIndex = Math.floor(i / ROW_SIZE);
-        const isRight = rowIndex % 2 === 1; // 偶数行（0,2,4,...)を左寄せ、奇数行を右寄せ
-        if (isRight) row.reverse(); // 右寄せの行はカードを逆順に
-        rows.push({ row, isRight });
-    }
+    
+    // イベントを行ごとに分割して配置情報を追加
+    const rows = Array.from({ length: Math.ceil(events.length / ROW_SIZE) }, (_, rowIndex) => {
+        const startIdx = rowIndex * ROW_SIZE;
+        const isRight = rowIndex % 2 === 1; // 偶数行は左寄せ、奇数行は右寄せ
+        
+        // 現在の行のイベントを取得
+        let rowEvents = events.slice(startIdx, startIdx + ROW_SIZE);
+        
+        // 右寄せの行はカードを逆順に
+        if (isRight) rowEvents = [...rowEvents].reverse();
+        
+        return { row: rowEvents, isRight };
+    });
 
     return (
         <div className="timeline">
