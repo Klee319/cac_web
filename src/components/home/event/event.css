@@ -1,275 +1,102 @@
 body{
     --vh: 1vh;
-
 }
 
-/* 全体レイアウト */
-.timeline {
+/* イベントコンテナ - Flexboxを使用して配置 */
+.event-container {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 7vw;
-    position: relative;
-    width: 100%;
-    padding-left: 7vw;
-    padding-right: 7vw;
-    padding-bottom: 10vw;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3.5rem; /* 余白を増やす */
+    padding: 3rem; /* 余白を増やす */
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-bottom: 60px;
 }
 
-/* .timeline-item 内のテキスト色を白に変更 */
-.timeline-item .timeline-date,
-.timeline-item .timeline-title
-{
-    color: #ffffff; /* 白色 */
-}
-
-/* オプション: テキストに影を追加してさらに見やすくする */
-.timeline-item .timeline-content {
-    position: relative;
-    text-shadow: 3px 3px 4px rgba(0, 0, 0, 1);
-}
-
-.overlay {
-    position: absolute;
-    top: 15%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 30%;
-    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒レイヤー（透明度は0.4に設定） */
-    pointer-events: none; /* オーバーレイがクリックイベントを妨げないように */
-    border-radius: 30px 30px 0 0 ;
-}
-
-/* 各行の配置 */
-.timeline-row {
-    display: flex;
-    justify-content: flex-end; /* 最初は右寄せ */
-    align-items: center;
-    position: relative;
-    width: 100%;
-}
-
-.timeline-row.left {
-    justify-content: flex-start; /* 左寄せ */
-}
-
-.timeline-row.right {
-    justify-content: flex-end; /* 右寄せ */
-}
-
-
-
-/* カード */
-.timeline-item {
+/* イベントカード */
+.event-card {
     border-radius: 30px;
-    width: 20vw;
-    height: 15vw;
+    width: 320px; /* 幅を調整 */
+    height: 240px; /* 高さを調整してアスペクト比4:3に */
     text-align: center;
     position: relative;
-    margin: 0 10px;
+    flex: 0 0 auto;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 40px;
 }
 
-/* コネクタ（水平線） */
-.connector-horizontal {
-    height: 1.5vh;
-    width: 12vw;
-    border-radius: 6px;
+.event-card:hover {
+    transform: translateY(-5px);
 }
 
-/* コネクタ（縦線） */
-.connector-vertical {
-    position: absolute;
-    width: 1.5vh;
-    height: 15vh;
-    top: 100%; /* 行の下に配置 */
-    border-radius: 3px;
-    transform: translateY(-1px); /* 線が途切れないように微調整 */
-    will-change: transform, height, left; /* 変更される可能性のあるプロパティを最適化 */
-    transition: height 0.2s ease-out, left 0.2s ease-out; /* 高さと位置の変更をスムーズに */
-    z-index: 1; /* 他の要素より前面に表示 */
-    min-height: 10px; /* 最小の高さを設定 */
-}
+/* オーバーレイとテキスト関連のスタイルを削除 */
 
-/* 左寄せの縦線位置 */
-.timeline-row.left .connector-vertical {
-    left: 50%; /* カードの中央に配置 */
-    transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
-}
-
-/* 右寄せの縦線位置 */
-.timeline-row.right .connector-vertical {
-    left: 50%; /* カードの中央に配置 */
-    transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
-}
-
-/*スマホ*/
-@media (max-width: 428px) {
-    :root {
-        --row-size: 1;
+/* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .event-container {
+        gap: 3rem; /* 余白を増やす */
+        padding: 2.5rem; /* 余白を増やす */
     }
-    /* 全体レイアウト */
-    .timeline {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15vw;
-        position: relative;
+    
+    .event-card {
+        width: 280px; /* 幅を調整 */
+        height: 210px; /* 高さを調整してアスペクト比4:3に */
+    }
+    
+    .event-date {
+        font-size: 1.3rem;
+    }
+    
+    .event-title {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-container {
+        gap: 2.5rem; /* 余白を増やす */
+        padding: 2rem; /* 余白を増やす */
+    }
+    
+    .event-card {
+        width: 240px; /* 幅を調整 */
+        height: 180px; /* 高さを調整してアスペクト比4:3に */
+    }
+    
+    .event-date {
+        font-size: 1.2rem;
+    }
+    
+    .event-title {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .event-container {
+        gap: 2rem; /* 余白を増やす */
+        padding: 1.5rem; /* 余白を増やす */
+    }
+    
+    .event-card {
         width: 100%;
-        padding: 10vw 10vw 25vw;
+        height: calc((100vw - 3rem) * 0.75); /* 幅の75%の高さでアスペクト比4:3に */
+        max-width: 320px;
     }
-    /* カード */
-    .timeline-item {
-        border-radius: 30px;
-        width: 80vw;
-        height: 60vw;
-        text-align: center;
-        position: relative;
-        margin: 0 10px;
+    
+    .event-date {
+        font-size: 1.3rem;
     }
-
-
-    /* コネクタ（水平線） */
-    .connector-horizontal {
-        height: 1.5vh;
-        flex-grow: 1;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* コネクタ（縦線） */
-    .connector-vertical {
-        position: absolute;
-        width: 1.5vh;
-        height: 15vh;
-        top: 100%; /* 行の下に配置 */
-        border-radius: 3px;
-        will-change: transform, height, left; /* 変更される可能性のあるプロパティを最適化 */
-        transition: height 0.2s ease-out, left 0.2s ease-out; /* 高さと位置の変更をスムーズに */
-        z-index: 1; /* 他の要素より前面に表示 */
-        min-height: 10px; /* 最小の高さを設定 */
-    }
-    /* 左寄せの縦線位置 */
-    .timeline-row.left .connector-vertical {
-        left: 50%; /* カードの中央に配置 */
-        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
-    }
-
-    /* 右寄せの縦線位置 */
-    .timeline-row.right .connector-vertical {
-        left: 50%; /* カードの中央に配置 */
-        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
-    }
-    .timeline-date{
-        font-size: 3.5vw;
-    }
-    .timeline-title{
-        font-size: 4vw;
+    
+    .event-title {
+        font-size: 1.5rem;
     }
 }
 
-/* 横向き(Googleからのスマホ・タブレットアクセスを除く)*/
-@media (min-width:428px) and (min-aspect-ratio: 4/3) {
-    :root {
-        --row-size: 3;
-    }
-    .timeline-date{
-        font-size: 1.5vw;
-    }
-    .timeline-title{
-        font-size: 1.5vw;
-    }
+/* ダークモード対応 */
+.dark-mode .event-card {
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
 }
-
-/* タブレット用（縦向き表示の時） */
-@media (max-width:1280px) and (min-height:768px) and (orientation: portrait) {
-    :root {
-        --row-size: 3; /* PC版と同じ行サイズに設定 */
-    }
-    
-    /* カード */
-    .timeline-item {
-        border-radius: 30px;
-        width: 25vw; /* タブレット用に調整 */
-        height: 20vw; /* タブレット用に調整 */
-        text-align: center;
-        position: relative;
-        margin: 0 10px;
-    }
-    
-    /* コネクタ（水平線） */
-    .connector-horizontal {
-        height: 1.5vh;
-        width: 10vw; /* タブレット用に調整 */
-        border-radius: 6px;
-    }
-    
-    .timeline-date{
-        font-size: 2vw; /* タブレット用に調整 */
-    }
-    .timeline-title{
-        font-size: 2.5vw; /* タブレット用に調整 */
-    }
-}
-
-/* スマホ（横向き表示の時（高さ不足）) */
-@media (max-height: 428px){
-    :root {
-        --row-size: 3; /* PC版と同じ行サイズに設定 */
-    }
-    
-    /* カード */
-    .timeline-item {
-        border-radius: 30px;
-        width: 30vw;
-        height: 25vw;
-        text-align: center;
-        position: relative;
-        margin: 0 10px;
-    }
-    
-    /* コネクタ（水平線） */
-    .connector-horizontal {
-        height: 1.5vh;
-        width: 8vw;
-        border-radius: 6px;
-    }
-    
-    /* 左寄せの縦線位置 */
-    .timeline-row.left .connector-vertical {
-        left: 50%; /* カードの中央に配置 */
-        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
-    }
-    
-    /* 右寄せの縦線位置 */
-    .timeline-row.right .connector-vertical {
-        left: 50%; /* カードの中央に配置 */
-        transform: translateX(-50%) translateY(-1px); /* 中央揃えと線が途切れないように微調整 */
-    }
-    
-    /* コネクタ（縦線）の最適化 */
-    .connector-vertical {
-        will-change: transform, height, left; /* 変更される可能性のあるプロパティを最適化 */
-        transition: height 0.2s ease-out, left 0.2s ease-out; /* 高さと位置の変更をスムーズに */
-        z-index: 1; /* 他の要素より前面に表示 */
-        min-height: 10px; /* 最小の高さを設定 */
-    }
-    
-    .timeline-date{
-        font-size: 2vw;
-    }
-    .timeline-title{
-        font-size: 2.5vw;
-    }
-}
-
-
-/* タブレット用（横向き表示の時） */
-@media (min-width:1024px) and (max-height:960px) and (orientation: landscape) {
-    :root {
-        --row-size: 3;
-    }
-}
-

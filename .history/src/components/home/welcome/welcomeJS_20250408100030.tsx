@@ -79,16 +79,6 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             
             // transform-originをPC版と同じに設定
             board.style.transformOrigin = 'center bottom';
-            
-            // デバッグ用
-            console.log('Mobile/Tablet position adjustment:', {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                handX,
-                handY,
-                rectLeft: rect.left,
-                rectTop: rect.top
-            });
         } else {
             // PC表示時の位置調整
             const handX = window.scrollX + rect.left - rect.width * 0.04;
@@ -96,16 +86,6 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             
             board.style.left = `${handX}px`;
             board.style.top = `${handY}px`;
-            
-            // デバッグ用
-            console.log('PC position adjustment:', {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                handX,
-                handY,
-                rectLeft: rect.left,
-                rectTop: rect.top
-            });
         }
     };
 
@@ -137,15 +117,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
     ) => {
         // スマホ表示かどうかを判定
         const isMobile = window.innerWidth <= 428;
-        
         // タブレット縦向き表示かどうかを判定
-        const isTabletPortrait = window.innerWidth > 428 && window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-        
-        // iPad Pro縦向き表示かどうかを判定
-        const isIPadProPortrait = window.innerWidth >= 1024 && window.innerWidth <= 1280 && window.innerHeight >= 1180 && window.innerWidth / window.innerHeight < 0.8;
-        
+        const isTabletPortrait = window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
         // スマホまたはタブレット縦向き表示かどうかを判定
-        const isMobileOrTabletPortrait = isMobile || isTabletPortrait || isIPadProPortrait;
+        const isMobileOrTabletPortrait = isMobile || isTabletPortrait;
         
         // スマホまたはタブレット縦向き表示時はパラメータを調整
         const adjustedFinalPositionY = isMobileOrTabletPortrait ? finalPositionY / 2 : finalPositionY;
@@ -244,25 +219,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
         // スマホ表示かどうかを判定
         const isMobile = window.innerWidth <= 428;
-        
         // タブレット縦向き表示かどうかを判定
-        const isTabletPortrait = window.innerWidth > 428 && window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-        
-        // iPad Pro縦向き表示かどうかを判定
-        const isIPadProPortrait = window.innerWidth >= 1024 && window.innerWidth <= 1280 && window.innerHeight >= 1180 && window.innerWidth / window.innerHeight < 0.8;
-        
+        const isTabletPortrait = window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
         // スマホまたはタブレット縦向き表示かどうかを判定
-        const isMobileOrTabletPortrait = isMobile || isTabletPortrait || isIPadProPortrait;
-        
-        // デバッグ用
-        console.log('Device detection:', {
-            width: window.innerWidth,
-            height: window.innerHeight,
-            isMobile,
-            isTabletPortrait,
-            isIPadProPortrait,
-            isMobileOrTabletPortrait
-        });
+        const isMobileOrTabletPortrait = isMobile || isTabletPortrait;
 
         // キャラクターのアニメーション設定
         if (catA && catB) {
