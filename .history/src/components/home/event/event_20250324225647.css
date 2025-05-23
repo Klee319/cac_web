@@ -1,0 +1,102 @@
+body{
+    --vh: 1vh;
+}
+
+/* イベントコンテナ - Flexboxを使用して配置 */
+.event-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 3.5rem; /* 余白を増やす */
+    padding: 3rem; /* 余白を増やす */
+    max-width: 1400px;
+    margin: 0 auto;
+    margin-bottom: 50px;
+}
+
+/* イベントカード */
+.event-card {
+    border-radius: 30px;
+    width: 320px; /* 幅を調整 */
+    height: 240px; /* 高さを調整してアスペクト比4:3に */
+    text-align: center;
+    position: relative;
+    flex: 0 0 auto;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+}
+
+/* オーバーレイとテキスト関連のスタイルを削除 */
+
+/* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .event-container {
+        gap: 3rem; /* 余白を増やす */
+        padding: 2.5rem; /* 余白を増やす */
+    }
+    
+    .event-card {
+        width: 280px; /* 幅を調整 */
+        height: 210px; /* 高さを調整してアスペクト比4:3に */
+    }
+    
+    .event-date {
+        font-size: 1.3rem;
+    }
+    
+    .event-title {
+        font-size: 1.6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-container {
+        gap: 2.5rem; /* 余白を増やす */
+        padding: 2rem; /* 余白を増やす */
+    }
+    
+    .event-card {
+        width: 240px; /* 幅を調整 */
+        height: 180px; /* 高さを調整してアスペクト比4:3に */
+    }
+    
+    .event-date {
+        font-size: 1.2rem;
+    }
+    
+    .event-title {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .event-container {
+        gap: 2rem; /* 余白を増やす */
+        padding: 1.5rem; /* 余白を増やす */
+    }
+    
+    .event-card {
+        width: 100%;
+        height: calc((100vw - 3rem) * 0.75); /* 幅の75%の高さでアスペクト比4:3に */
+        max-width: 320px;
+    }
+    
+    .event-date {
+        font-size: 1.3rem;
+    }
+    
+    .event-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* ダークモード対応 */
+.dark-mode .event-card {
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
