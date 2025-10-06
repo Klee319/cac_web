@@ -2,47 +2,53 @@
   "mobile-portrait": {
     "catA": {
       "offsetX": 5,
-      "offsetY": 30
+      "offsetY": 30,
+      "finalPositionY": 8
     },
     "catB": {
       "offsetX": 35,
-      "offsetY": -35
+      "offsetY": 35,
+      "finalPositionY": 9
     },
     "spotlightR": {
       "offsetTop": -20,
       "offsetRight": -20
     },
     "spotlightL": {
-      "offsetTop": 30,
+      "offsetTop": 15,
       "offsetLeft": 0
     }
   },
   "mobile-landscape": {
     "catA": {
       "offsetX": 0,
-      "offsetY": 0
+      "offsetY": 0,
+      "finalPositionY": 8
     },
     "catB": {
       "offsetX": 0,
-      "offsetY": 0
+      "offsetY": 80,
+      "finalPositionY": 17
     },
     "spotlightR": {
       "offsetTop": -30,
       "offsetRight": 20
     },
     "spotlightL": {
-      "offsetTop": 30,
+      "offsetTop": 40,
       "offsetLeft": 5
     }
   },
   "tablet-portrait": {
     "catA": {
       "offsetX": 0,
-      "offsetY": 0
+      "offsetY": 0,
+      "finalPositionY": 8
     },
     "catB": {
-      "offsetX": 0,
-      "offsetY": 0
+      "offsetX": 20,
+      "offsetY": 0,
+      "finalPositionY": 9
     },
     "spotlightR": {
       "offsetTop": -20,
@@ -56,36 +62,40 @@
   "tablet-landscape": {
     "catA": {
       "offsetX": 0,
-      "offsetY": 0
+      "offsetY": 0,
+      "finalPositionY": 7
     },
     "catB": {
-      "offsetX": 0,
-      "offsetY": 0
+      "offsetX": 10,
+      "offsetY": 0,
+      "finalPositionY": 13
     },
     "spotlightR": {
       "offsetTop": -50,
       "offsetRight": 0
     },
     "spotlightL": {
-      "offsetTop": 80,
+      "offsetTop": 85,
       "offsetLeft": 20
     }
   },
   "desktop": {
     "catA": {
       "offsetX": 0,
-      "offsetY": 0
+      "offsetY": 0,
+      "finalPositionY": 50
     },
     "catB": {
       "offsetX": 0,
-      "offsetY": 0
+      "offsetY": -10,
+      "finalPositionY": 75
     },
     "spotlightR": {
       "offsetTop": -50,
       "offsetRight": 20
     },
     "spotlightL": {
-      "offsetTop": 90,
+      "offsetTop": 70,
       "offsetLeft": 20
     }
   }

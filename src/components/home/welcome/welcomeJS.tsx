@@ -13,6 +13,193 @@ interface SpotlightPosition {
     r: number;
 }
 
+// キャラクター設定の型定義
+interface CharacterConfig {
+    offsetX: number;
+    offsetY: number;
+    finalPositionY: number;
+    amplitude?: number;
+    frequency?: number;
+    bounceFactor?: number;
+}
+
+// アニメーションパラメータの型定義
+interface AnimationParams {
+    amplitude: number;
+    frequency: number;
+    bounceFactor: number;
+    finalPositionY: number;
+}
+
+// デバイス別パラメータ範囲定数
+const DEVICE_PARAM_RANGES: Record<string, {
+    minY: number;
+    maxY: number;
+    minAmplitude: number;
+    maxAmplitude: number;
+    minFrequency: number;
+    maxFrequency: number;
+    minBounce: number;
+    maxBounce: number;
+}> = {
+    'mobile-portrait': {
+        minY: 8,
+        maxY: 9,
+        minAmplitude: 2,
+        maxAmplitude: 12,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'mobile-landscape': {
+        minY: 8,
+        maxY: 17,
+        minAmplitude: 3,
+        maxAmplitude: 15,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'tablet-portrait': {
+        minY: 8,
+        maxY: 9,
+        minAmplitude: 2,
+        maxAmplitude: 12,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'tablet-landscape': {
+        minY: 7,
+        maxY: 13,
+        minAmplitude: 8,
+        maxAmplitude: 18,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'desktop': {
+        minY: 50,
+        maxY: 75,
+        minAmplitude: 8,
+        maxAmplitude: 25,
+        minFrequency: 0.003,
+        maxFrequency: 0.08,
+        minBounce: 0.45,
+        maxBounce: 0.75
+    }
+};
+
+// パラメータ計算関数群
+
+/**
+ * Y座標を0.0〜1.0の範囲に正規化する
+ */
+function normalizePosition(
+    finalPositionY: number,
+    minY: number,
+    maxY: number
+): number {
+    // ゼロ除算を回避（minY === maxYの場合）
+    if (maxY === minY) {
+        return 0.5; // 中間値を返す
+    }
+
+    // 正規化計算
+    const normalized = (finalPositionY - minY) / (maxY - minY);
+
+    // 0.0〜1.0の範囲にクランプ
+    return Math.max(0, Math.min(1, normalized));
+}
+
+/**
+ * 正規化されたY座標に基づいて揺れの振幅を計算する
+ */
+function calculateAmplitude(
+    normalizedY: number,
+    minAmplitude: number,
+    maxAmplitude: number
+): number {
+    return minAmplitude + (maxAmplitude - minAmplitude) * normalizedY;
+}
+
+/**
+ * 正規化されたY座標に基づいて揺れの周波数を計算する
+ */
+function calculateFrequency(
+    normalizedY: number,
+    minFrequency: number,
+    maxFrequency: number
+): number {
+    return maxFrequency - (maxFrequency - minFrequency) * normalizedY;
+}
+
+/**
+ * 正規化されたY座標に基づいてバウンド係数を計算する
+ */
+function calculateBounceFactor(
+    normalizedY: number,
+    minBounce: number,
+    maxBounce: number
+): number {
+    return minBounce + (maxBounce - minBounce) * normalizedY;
+}
+
+/**
+ * アニメーションパラメータを統合的に計算する
+ */
+function getAnimationParams(
+    config: CharacterConfig,
+    deviceKey: string
+): AnimationParams {
+    const finalPositionY = config.finalPositionY;
+
+    // 設定ファイルに明示的にパラメータが存在する場合はそれを使用
+    if (config.amplitude !== undefined &&
+        config.frequency !== undefined &&
+        config.bounceFactor !== undefined) {
+        return {
+            amplitude: config.amplitude,
+            frequency: config.frequency,
+            bounceFactor: config.bounceFactor,
+            finalPositionY: finalPositionY,
+        };
+    }
+
+    // デバイス固有のパラメータ範囲を取得
+    const ranges = DEVICE_PARAM_RANGES[deviceKey] || DEVICE_PARAM_RANGES['desktop'];
+
+    // minY === maxYの場合の特別処理（tablet, desktop等）
+    if (ranges.minY === ranges.maxY) {
+        // 固定値を返す（中間値を使用）
+        return {
+            amplitude: (ranges.minAmplitude + ranges.maxAmplitude) / 2,
+            frequency: (ranges.minFrequency + ranges.maxFrequency) / 2,
+            bounceFactor: (ranges.minBounce + ranges.maxBounce) / 2,
+            finalPositionY: finalPositionY,
+        };
+    }
+
+    // Y座標を正規化
+    const normalizedY = normalizePosition(finalPositionY, ranges.minY, ranges.maxY);
+
+    // 各パラメータを計算
+    const amplitude = calculateAmplitude(normalizedY, ranges.minAmplitude, ranges.maxAmplitude);
+    const frequency = calculateFrequency(normalizedY, ranges.minFrequency, ranges.maxFrequency);
+    const bounceFactor = calculateBounceFactor(normalizedY, ranges.minBounce, ranges.maxBounce);
+
+    return {
+        amplitude,
+        frequency,
+        bounceFactor,
+        finalPositionY,
+    };
+}
+
 export default function WelcomeJS({ isDarkMode }: Props) {
     // ウィンドウサイズの状態管理
     const [windowSize, setWindowSize] = useState({
@@ -75,9 +262,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
         const getSpotPosition = (element: HTMLElement): SpotlightPosition => {
             const rect = element.getBoundingClientRect();
+            // Canvas描画用はビューポート相対座標なのでscrollは不要
             return {
-                x: rect.left + window.scrollX + rect.width / 2,
-                y: rect.top + window.scrollY + rect.height / 2,
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
                 r: rect.width / 2,
             };
         };
@@ -116,16 +304,16 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         if (catA && spotlightR && config) {
             const catARect = catA.getBoundingClientRect();
             const spotlightRConfig = config.spotlightR;
-            spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.height * 0.5 + spotlightRConfig.offsetTop}px`;
-            spotlightR.style.right = `${window.scrollX + spotlightRConfig.offsetRight}px`;
+            spotlightR.style.top = `${catARect.bottom - catARect.height * 0.5 + spotlightRConfig.offsetTop}px`;
+            spotlightR.style.right = `${spotlightRConfig.offsetRight}px`;
         }
 
         // キャラクターBとスポットライトLの位置調整
         if (catB && spotlightL && config) {
             const catBRect = catB.getBoundingClientRect();
             const spotlightLConfig = config.spotlightL;
-            spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.height * 0.5 + spotlightLConfig.offsetTop}px`;
-            spotlightL.style.left = `${window.scrollX + spotlightLConfig.offsetLeft}px`;
+            spotlightL.style.top = `${catBRect.bottom - catBRect.height * 0.5 + spotlightLConfig.offsetTop}px`;
+            spotlightL.style.left = `${spotlightLConfig.offsetLeft}px`;
         }
 
         // メインキャラクターとボードの位置調整
@@ -183,24 +371,30 @@ export default function WelcomeJS({ isDarkMode }: Props) {
     // キャラクターのアニメーション作成
     const createAnimation = useCallback((
         element: HTMLElement,
-        finalPositionY: number,
-        amplitude: number,
-        frequency: number,
-        gravity = 1.3,
-        bounceFactor = 0.7,
-        baseOffsetX = 0,  // X方向のベースオフセット
-        baseOffsetY = 0   // Y方向のベースオフセット
+        characterName: 'catA' | 'catB'  // キャラクター名を受け取る
     ) => {
-        const { isMobileOrTablet } = getDeviceInfo();
-        const deviceKey = getDeviceConfigKey();
-        const isPortrait = deviceKey.includes('portrait');
+        let currentDeviceKey = getDeviceConfigKey();
+        let currentIsPortrait = currentDeviceKey.includes('portrait');
 
-        // portraitモード時のみパラメータを調整
-        const adjustedFinalPositionY = isPortrait ? finalPositionY / 2 : finalPositionY;
-        const adjustedAmplitude = isPortrait ? amplitude / 1.5 : amplitude;
+        // 現在のデバイスキーに応じたconfigを取得
+        let currentConfig = (catPositionConfig as any)[currentDeviceKey][characterName];
+
+        // オフセット値を取得
+        let baseOffsetX = currentConfig.offsetX;
+        let baseOffsetY = currentConfig.offsetY;
+
+        // パラメータを計算または設定ファイルから取得（デバイスキーベース）
+        let params = getAnimationParams(currentConfig, currentDeviceKey);
+
+        // portraitモード時のみfinalPositionYとamplitudeを調整
+        let adjustedFinalPositionY = currentIsPortrait ? params.finalPositionY / 2 : params.finalPositionY;
+        let adjustedAmplitude = currentIsPortrait ? params.amplitude / 1.5 : params.amplitude;
+
+        // 重力加速度（マイルドなバウンド演出のため低めに設定）
+        const gravity = 0.8;
 
         // 初期位置をportraitモード時のみ調整
-        let positionY = isPortrait ? -500 : -1150;
+        let positionY = currentIsPortrait ? -500 : -1150;
         let velocity = 0;
         let angle = -1;
         let isBouncing = true;
@@ -213,14 +407,14 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
             if (positionY >= adjustedFinalPositionY) {
                 positionY = adjustedFinalPositionY;
-                velocity = -velocity * bounceFactor;
+                velocity = -velocity * params.bounceFactor; // 計算されたバウンド係数を使用
 
                 if (Math.abs(velocity) < 1) {
                     isBouncing = false;
                 }
             }
 
-            angle += frequency;
+            angle += params.frequency; // 計算された周波数を使用
             const swayOffset = Math.sin(angle) * adjustedAmplitude;
 
             element.style.transform = `translate(${swayOffset + baseOffsetX}px, ${positionY + baseOffsetY}px)`;
@@ -241,7 +435,7 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             if (animationId !== null) cancelAnimationFrame(animationId);
 
             velocity = 0;
-            positionY = isPortrait ? -500 : -1150; // portraitモード時は初期位置を調整
+            positionY = currentIsPortrait ? -500 : -1150; // portraitモード時は初期位置を調整
             isBouncing = true;
             angle = 0;
 
@@ -250,16 +444,36 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
         // リサイズイベントハンドラ
         const handleResize = () => {
+            // orientationchange経由でない通常のresizeのみ処理
+            // （orientationchangeは別途ハンドラで処理されるため）
             const newDeviceKey = getDeviceConfigKey();
             const newIsPortrait = newDeviceKey.includes('portrait');
 
-            // portrait状態が変わった場合のみ再調整
-            if (newIsPortrait !== isPortrait) {
+            // デバイスキーが変わった場合に再調整
+            if (newDeviceKey !== currentDeviceKey) {
                 if (animationId !== null) cancelAnimationFrame(animationId);
+
+                // 現在のデバイスキーとパラメータを更新
+                currentDeviceKey = newDeviceKey;
+                currentIsPortrait = newIsPortrait;
+
+                // 新しいデバイスキーに応じた新しいconfigを取得
+                currentConfig = (catPositionConfig as any)[newDeviceKey][characterName];
+
+                // オフセット値を更新
+                baseOffsetX = currentConfig.offsetX;
+                baseOffsetY = currentConfig.offsetY;
+
+                params = getAnimationParams(currentConfig, currentDeviceKey);
+                adjustedFinalPositionY = currentIsPortrait ? params.finalPositionY / 2 : params.finalPositionY;
+                adjustedAmplitude = currentIsPortrait ? params.amplitude / 1.5 : params.amplitude;
+
+                // アニメーション状態をリセット
                 velocity = 0;
-                positionY = newIsPortrait ? -500 : -1150;
+                positionY = currentIsPortrait ? -500 : -1150;
                 isBouncing = true;
                 angle = 0;
+
                 animationId = requestAnimationFrame(startAnimation);
             }
         };
@@ -275,16 +489,48 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         };
     }, [updatePosition]);
 
-    // キャラクターとボードのアニメーション設定
+    // ウィンドウサイズの監視（リサイズ時に位置更新）
     useEffect(() => {
         const handleResize = () => {
             setWindowSize({
                 width: window.innerWidth,
                 height: window.innerHeight,
             });
-            // リサイズ時に位置を更新
             updatePosition();
         };
+
+        // orientationchange時はwindowサイズ更新を待つ
+        const handleOrientationChange = () => {
+            // windowサイズが更新されるまで待機
+            const checkSize = () => {
+                const currentOrientation = window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+                const screenOrientation = screen.orientation?.type.includes('portrait') ? 'portrait' : 'landscape';
+
+                // windowサイズとscreen.orientationが一致するまで待機
+                if (currentOrientation === screenOrientation) {
+                    setWindowSize({
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                    });
+                    updatePosition();
+                } else {
+                    requestAnimationFrame(checkSize);
+                }
+            };
+            requestAnimationFrame(checkSize);
+        };
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleOrientationChange);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('orientationchange', handleOrientationChange);
+        };
+    }, [updatePosition]);
+
+    // キャラクターとボードのアニメーション設定
+    useEffect(() => {
 
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
@@ -302,22 +548,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         // キャラクターのアニメーション設定
         if (catA && catB && config) {
             catA.classList.remove('del');
-            if (isPortrait) {
-                // portraitモード: モバイル/タブレット縦向き用パラメータ
-                createAnimation(catA, 60, 5, 0.05, 1.3, 0.7, config.catA.offsetX, config.catA.offsetY);
-            } else {
-                // landscapeモードまたはPC: デスクトップ用パラメータ
-                createAnimation(catA, 50, 7, 0.05, 1.3, 0.7, config.catA.offsetX, config.catA.offsetY);
-            }
+            createAnimation(catA, 'catA');
 
             catB.classList.remove('del');
-            if (isPortrait) {
-                // portraitモード: モバイル/タブレット縦向き用パラメータ
-                createAnimation(catB, 0, 10, 0.01, 1.3, 0.7, config.catB.offsetX, config.catB.offsetY);
-            } else {
-                // landscapeモードまたはPC: デスクトップ用パラメータ
-                createAnimation(catB, 50, 20, 0.01, 1.3, 0.7, config.catB.offsetX, config.catB.offsetY);
-            }
+            createAnimation(catB, 'catB');
         }
 
         // ボードとメインキャラクターの表示とアニメーション
@@ -327,18 +561,13 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             board.classList.remove('del');
             animateBoard(board);
         }
-        
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('orientationchange', handleResize);
+
         window.addEventListener('load', updatePosition);
 
         // 初期表示時に位置を更新（少し遅延させて要素のレンダリングを待つ）
         setTimeout(updatePosition, 100);
 
         return () => {
-            window.removeEventListener('resize', handleResize);
-            window.removeEventListener('orientationchange', handleResize);
             window.removeEventListener('load', updatePosition);
         };
     }, [createAnimation, animateBoard, updatePosition]);
@@ -507,9 +736,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
             const getSpotPosition = (element: HTMLElement): SpotlightPosition => {
                 const rect = element.getBoundingClientRect();
+                // Canvas描画用はビューポート相対座標なのでscrollは不要
                 return {
-                    x: rect.left + window.scrollX + rect.width / 2,
-                    y: rect.top + window.scrollY + rect.height / 2,
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2,
                     r: rect.width / 2,
                 };
             };
