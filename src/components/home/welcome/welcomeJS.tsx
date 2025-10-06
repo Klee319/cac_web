@@ -1,5 +1,6 @@
 import "./welcome.css";
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import catPositionConfig from './catPositionConfig.json';
 
 // 型定義
 type Props = {
@@ -12,118 +13,6 @@ interface SpotlightPosition {
     r: number;
 }
 
-// DOM要素の参照型定義
-interface CachedElements {
-    board: HTMLElement | null;
-    catMain: HTMLElement | null;
-    catA: HTMLElement | null;
-    catB: HTMLElement | null;
-    spotlightL: HTMLElement | null;
-    spotlightR: HTMLElement | null;
-    cacLogo: HTMLElement | null;
-}
-
-// デバイス情報のキャッシュ
-let cachedDeviceInfo: {
-    isMobile: boolean;
-    isTabletPortrait: boolean;
-    isIPadProPortrait: boolean;
-    isMobileOrTabletPortrait: boolean;
-    isTouchDevice: boolean;
-    timestamp: number;
-} | null = null;
-
-// デバイス情報を取得（キャッシュ化）
-const getDeviceInfo = () => {
-    const now = Date.now();
-    // 100ms以内はキャッシュを使用
-    if (cachedDeviceInfo && (now - cachedDeviceInfo.timestamp) < 100) {
-        return cachedDeviceInfo;
-    }
-
-    const isMobile = window.innerWidth <= 428;
-    const isTabletPortrait = window.innerWidth > 428 && window.innerWidth <= 1280 &&
-                            window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-    const isIPadProPortrait = window.innerWidth >= 1024 && window.innerWidth <= 1280 &&
-                             window.innerHeight >= 1180 && window.innerWidth / window.innerHeight < 0.8;
-    const isMobileOrTabletPortrait = isMobile || isTabletPortrait || isIPadProPortrait;
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-    cachedDeviceInfo = {
-        isMobile,
-        isTabletPortrait,
-        isIPadProPortrait,
-        isMobileOrTabletPortrait,
-        isTouchDevice,
-        timestamp: now
-    };
-
-    return cachedDeviceInfo;
-};
-
-// アニメーションマネージャークラス
-class AnimationManager {
-    private callbacks: Map<string, () => void> = new Map();
-    private frameId: number | null = null;
-    private lastFrameTime: number = 0;
-    private targetFPS: number = 60;
-
-    constructor() {
-        // モバイルデバイスでは30FPSに制限
-        const deviceInfo = getDeviceInfo();
-        this.targetFPS = deviceInfo.isMobileOrTabletPortrait ? 30 : 60;
-    }
-
-    register(id: string, callback: () => void) {
-        this.callbacks.set(id, callback);
-        if (!this.frameId) {
-            this.start();
-        }
-    }
-
-    unregister(id: string) {
-        this.callbacks.delete(id);
-        if (this.callbacks.size === 0) {
-            this.stop();
-        }
-    }
-
-    private start() {
-        const frameInterval = 1000 / this.targetFPS;
-
-        const animate = (currentTime: number) => {
-            if (currentTime - this.lastFrameTime >= frameInterval) {
-                this.callbacks.forEach(callback => callback());
-                this.lastFrameTime = currentTime;
-            }
-            this.frameId = requestAnimationFrame(animate);
-        };
-
-        this.frameId = requestAnimationFrame(animate);
-    }
-
-    private stop() {
-        if (this.frameId) {
-            cancelAnimationFrame(this.frameId);
-            this.frameId = null;
-        }
-    }
-
-    clear() {
-        this.callbacks.clear();
-        this.stop();
-    }
-}
-
-// タッチイベントリスナーのオプション定数
-const TOUCH_EVENT_OPTIONS = { passive: false };
-const TOUCH_EVENT_OPTIONS_PASSIVE = { passive: true };
-
-// アニメーション定数
-const ROTATION_ANGLE_RANGE = 5;
-const ROTATION_INITIAL_OFFSET = -35;
-const ROTATION_SPEED = 0.01;
-
 export default function WelcomeJS({ isDarkMode }: Props) {
     // ウィンドウサイズの状態管理
     const [windowSize, setWindowSize] = useState({
@@ -131,199 +20,194 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         height: 0,
     });
 
-    // 位置更新のためのラフ実行防止（useRefで管理）
-    const updatePositionFrameIdRef = useRef<number | null>(null);
+    // オーバーレイ表示状態（モバイル/タブレット用）
+    const [overlayVisible, setOverlayVisible] = useState(true);
 
-    // スロットリング用のタイムスタンプ
-    const lastUpdateTimeRef = useRef<number>(0);
-    const UPDATE_THROTTLE = 100; // 100ms間隔でスロットリング
+    // スポットライト配列の参照
+    const spotlightsRef = useRef<SpotlightPosition[]>([]);
+    const updateSpotlightCallbackRef = useRef<((spots: SpotlightPosition[]) => void) | null>(null);
 
-    // AnimationManagerのインスタンス（コンポーネント毎）
-    const animationManagerRef = useRef<AnimationManager | null>(null);
+    // デバイス判定の共通化関数（タッチデバイス検知）
+    const getDeviceInfo = () => {
+        // タッチデバイスかどうかを判定
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    // DOM要素のキャッシュ
-    const elementsRef = useRef<CachedElements>({
-        board: null,
-        catMain: null,
-        catA: null,
-        catB: null,
-        spotlightL: null,
-        spotlightR: null,
-        cacLogo: null,
-    });
+        // スマホサイズかどうか
+        const isMobile = window.innerWidth <= 428;
 
-    // アニメーション完了状態の管理
-    const animationCompleteRef = useRef<{
-        catA: boolean;
-        catB: boolean;
-    }>({
-        catA: false,
-        catB: false,
-    });
+        // タブレットサイズかどうか（タッチデバイスかつスマホより大きい）
+        const isTablet = isTouchDevice && window.innerWidth > 428 && window.innerWidth <= 1280;
 
-    // スポットライト更新コールバック
-    const updateSpotlightsCallbackRef = useRef<(() => void) | null>(null);
+        // タッチデバイス全般（モバイル/タブレット）
+        const isMobileOrTablet = isTouchDevice && window.innerWidth <= 1280;
 
-    // AnimationManagerの初期化
-    useEffect(() => {
-        animationManagerRef.current = new AnimationManager();
-        return () => {
-            if (animationManagerRef.current) {
-                animationManagerRef.current.clear();
-            }
-        };
-    }, []);
-
-    // DOM要素をキャッシュする関数
-    const cacheElements = useCallback(() => {
-        elementsRef.current = {
-            board: document.querySelector('.cac-board') as HTMLElement | null,
-            catMain: document.querySelector('.cac-cat-main') as HTMLElement | null,
-            catA: document.querySelector('.catA') as HTMLElement | null,
-            catB: document.querySelector('.catB') as HTMLElement | null,
-            spotlightL: document.querySelector('.spotlightL') as HTMLElement | null,
-            spotlightR: document.querySelector('.spotlightR') as HTMLElement | null,
-            cacLogo: document.querySelector('.cac-logoL') as HTMLElement | null,
-        };
-    }, []);
-
-    // 要素の位置を更新する関数（最適化版）
-    const updatePosition = useCallback(() => {
-        // スロットリング実装
-        const now = Date.now();
-        if (now - lastUpdateTimeRef.current < UPDATE_THROTTLE) {
-            return;
-        }
-        lastUpdateTimeRef.current = now;
-
-        // 連続実行を防止
-        if (updatePositionFrameIdRef.current !== null) {
-            cancelAnimationFrame(updatePositionFrameIdRef.current);
-        }
-
-        updatePositionFrameIdRef.current = requestAnimationFrame(() => {
-            const { board, catMain, catA, catB, spotlightL, spotlightR } = elementsRef.current;
-
-            // デバイス情報を取得（キャッシュ使用）
-            const deviceInfo = getDeviceInfo();
-            const { isMobileOrTabletPortrait } = deviceInfo;
-
-            // キャラクターAとスポットライトRの位置調整
-            if (catA && spotlightR) {
-                const catARect = catA.getBoundingClientRect();
-                if (isMobileOrTabletPortrait) {
-                    // スマホまたはタブレット縦向き表示時の位置調整
-                    spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.height * 0.5}px`;
-                    spotlightR.style.right = `${window.scrollX}px`;
-                } else {
-                    // PC表示時の位置調整
-                    spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.width * 1.3}px`;
-                    spotlightR.style.right = `${window.scrollX + catARect.right * 0.01}px`;
-                }
-            }
-
-            // キャラクターBとスポットライトLの位置調整
-            if (catB && spotlightL) {
-                const catBRect = catB.getBoundingClientRect();
-                if (isMobileOrTabletPortrait) {
-                    // スマホまたはタブレット縦向き表示時の位置調整
-                    spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.height * 0.5}px`;
-                    spotlightL.style.left = `${window.scrollX}px`;
-                } else {
-                    // PC表示時の位置調整
-                    spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.width * 1.5}px`;
-                    spotlightL.style.left = `${window.scrollX + catBRect.left * 0.6}px`;
-                }
-            }
-
-            // メインキャラクターとボードの位置調整
-            if (!catMain || !board) return;
-
-            const rect = catMain.getBoundingClientRect();
-
-            if (isMobileOrTabletPortrait) {
-                // スマホまたはタブレット縦向き表示時の位置調整
-                // PC版と同様の相対位置になるように調整
-                const handX = window.scrollX + rect.left - rect.width * 0.04;
-                const handY = window.scrollY + rect.top + rect.height * 0.25;
-
-                board.style.left = `${handX}px`;
-                board.style.top = `${handY}px`;
-
-                // transform-originをPC版と同じに設定
-                board.style.transformOrigin = 'center bottom';
-            } else {
-                // PC表示時の位置調整
-                const handX = window.scrollX + rect.left - rect.width * 0.04;
-                const handY = window.scrollY + rect.top + rect.height * 0.25;
-
-                board.style.left = `${handX}px`;
-                board.style.top = `${handY}px`;
-            }
-
-            // スポットライト位置更新のコールバックを呼び出し
-            if (updateSpotlightsCallbackRef.current && isDarkMode) {
-                updateSpotlightsCallbackRef.current();
-            }
-
-            updatePositionFrameIdRef.current = null;
-        });
-    }, [isDarkMode]);
-
-    // ボードのアニメーション
-    const boardRotationAngle = ROTATION_ANGLE_RANGE;
-    let currentRotation = -boardRotationAngle + ROTATION_INITIAL_OFFSET;
-    let rotationDirection = 1;
-
-    const animateBoard = (board: HTMLElement | null) => {
-        if (!board || !animationManagerRef.current) return;
-
-        const boardAnimation = () => {
-            currentRotation += rotationDirection * ROTATION_SPEED;
-            if (currentRotation > boardRotationAngle + ROTATION_INITIAL_OFFSET ||
-                currentRotation < -boardRotationAngle + ROTATION_INITIAL_OFFSET) {
-                rotationDirection *= -1;
-            }
-
-            board.style.transform = `rotate(${currentRotation}deg)`;
-        };
-
-        // AnimationManagerに登録
-        animationManagerRef.current.register('board', boardAnimation);
+        return { isTouchDevice, isMobile, isTablet, isMobileOrTablet };
     };
 
+    // デバイスタイプとオリエンテーションを判定してJSON設定キーを取得
+    const getDeviceConfigKey = () => {
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // 短辺を基準にデバイス判定
+        const shortSide = Math.min(width, height);
+        const longSide = Math.max(width, height);
+
+        if (shortSide <= 428) {
+            // モバイル: 短辺が428px以下
+            return isPortrait ? 'mobile-portrait' : 'mobile-landscape';
+        } else if (isTouchDevice && longSide <= 1280) {
+            // タブレット: タッチデバイスかつ長辺が1280px以下
+            return isPortrait ? 'tablet-portrait' : 'tablet-landscape';
+        } else {
+            return 'desktop';
+        }
+    };
+
+    // スポットライト位置を更新する関数
+    const updateSpotlightPositions = useCallback(() => {
+        const spotlightL = document.querySelector('.spotlightL') as HTMLElement | null;
+        const spotlightR = document.querySelector('.spotlightR') as HTMLElement | null;
+
+        if (!spotlightL || !spotlightR) return;
+
+        const getSpotPosition = (element: HTMLElement): SpotlightPosition => {
+            const rect = element.getBoundingClientRect();
+            return {
+                x: rect.left + window.scrollX + rect.width / 2,
+                y: rect.top + window.scrollY + rect.height / 2,
+                r: rect.width / 2,
+            };
+        };
+
+        const LLSpot = getSpotPosition(spotlightL);
+        const LRSpot = getSpotPosition(spotlightR);
+
+        // スポットライト配列を更新（インデックス1と2）
+        if (spotlightsRef.current.length >= 3) {
+            spotlightsRef.current[1] = LLSpot;
+            spotlightsRef.current[2] = LRSpot;
+
+            // 描画コールバックが登録されていれば呼び出し
+            if (updateSpotlightCallbackRef.current) {
+                updateSpotlightCallbackRef.current(spotlightsRef.current);
+            }
+        }
+    }, []);
+
+    // 要素の位置を更新する関数
+    const updatePosition = useCallback(() => {
+        const board = document.querySelector('.cac-board') as HTMLElement | null;
+        const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
+        const catA = document.querySelector('.catA') as HTMLElement | null;
+        const catB = document.querySelector('.catB') as HTMLElement | null;
+        const spotlightL = document.querySelector('.spotlightL') as HTMLElement | null;
+        const spotlightR = document.querySelector('.spotlightR') as HTMLElement | null;
+
+        const { isMobileOrTablet } = getDeviceInfo();
+
+        // JSON設定からデバイス固有の設定を取得
+        const deviceKey = getDeviceConfigKey();
+        const config = (catPositionConfig as any)[deviceKey];
+
+        // キャラクターAとスポットライトRの位置調整
+        if (catA && spotlightR && config) {
+            const catARect = catA.getBoundingClientRect();
+            const spotlightRConfig = config.spotlightR;
+            spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.height * 0.5 + spotlightRConfig.offsetTop}px`;
+            spotlightR.style.right = `${window.scrollX + spotlightRConfig.offsetRight}px`;
+        }
+
+        // キャラクターBとスポットライトLの位置調整
+        if (catB && spotlightL && config) {
+            const catBRect = catB.getBoundingClientRect();
+            const spotlightLConfig = config.spotlightL;
+            spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.height * 0.5 + spotlightLConfig.offsetTop}px`;
+            spotlightL.style.left = `${window.scrollX + spotlightLConfig.offsetLeft}px`;
+        }
+
+        // メインキャラクターとボードの位置調整
+        if (!catMain || !board) return;
+
+        const rect = catMain.getBoundingClientRect();
+        
+        if (isMobileOrTablet) {
+            // スマホまたはタブレット縦向き表示時の位置調整
+            // PC版と同様の相対位置になるように調整
+            const handX = window.scrollX + rect.left - rect.width * 0.04;
+            const handY = window.scrollY + rect.top + rect.height * 0.25;
+            
+            board.style.left = `${handX}px`;
+            board.style.top = `${handY}px`;
+
+            // transform-originをPC版と同じに設定
+            board.style.transformOrigin = 'center bottom';
+        } else {
+            // PC表示時の位置調整
+            const handX = window.scrollX + rect.left - rect.width * 0.04;
+            const handY = window.scrollY + rect.top + rect.height * 0.25;
+
+            board.style.left = `${handX}px`;
+            board.style.top = `${handY}px`;
+        }
+
+        // スポットライト位置も更新
+        updateSpotlightPositions();
+    }, [updateSpotlightPositions]);
+
+    // ボードのアニメーション
+    const animateBoard = useCallback((board: HTMLElement | null) => {
+        if (!board) return;
+
+        const angle = 5;
+        let angleValue = -angle - 35;
+        let direction = 1;
+
+        const animate = () => {
+            if (!board) return;
+
+            angleValue += direction * 0.01;
+            if (angleValue > angle - 35 || angleValue < -angle - 35) {
+                direction *= -1;
+            }
+
+            board.style.transform = `rotate(${angleValue}deg)`;
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+    }, []);
+
     // キャラクターのアニメーション作成
-    const createAnimation = (
+    const createAnimation = useCallback((
         element: HTMLElement,
         finalPositionY: number,
         amplitude: number,
         frequency: number,
-        animationId: string,
         gravity = 1.3,
-        bounceFactor = 0.7
+        bounceFactor = 0.7,
+        baseOffsetX = 0,  // X方向のベースオフセット
+        baseOffsetY = 0   // Y方向のベースオフセット
     ) => {
-        // デバイス情報を取得（キャッシュ使用）
-        let deviceInfo = getDeviceInfo();
-        let { isMobileOrTabletPortrait } = deviceInfo;
+        const { isMobileOrTablet } = getDeviceInfo();
+        const deviceKey = getDeviceConfigKey();
+        const isPortrait = deviceKey.includes('portrait');
 
-        // スマホまたはタブレット縦向き表示時はパラメータを調整
-        const adjustedFinalPositionY = isMobileOrTabletPortrait ? finalPositionY / 2 : finalPositionY;
-        const adjustedAmplitude = isMobileOrTabletPortrait ? amplitude / 1.5 : amplitude;
+        // portraitモード時のみパラメータを調整
+        const adjustedFinalPositionY = isPortrait ? finalPositionY / 2 : finalPositionY;
+        const adjustedAmplitude = isPortrait ? amplitude / 1.5 : amplitude;
 
-        // 初期位置をスマホまたはタブレット縦向き表示時は調整
-        let positionY = isMobileOrTabletPortrait ? -500 : -1150;
+        // 初期位置をportraitモード時のみ調整
+        let positionY = isPortrait ? -500 : -1150;
         let velocity = 0;
         let angle = -1;
         let isBouncing = true;
-        let hasCompleted = false;
+        let animationId: number | null = null;
 
-        // アニメーションの実行関数
-        const runAnimation = () => {
-            // アニメーション完了後は早期リターン
-            if (hasCompleted && !isBouncing) {
-                return;
-            }
-
+        // アニメーションの開始
+        const startAnimation = () => {
             velocity += gravity;
             positionY += velocity;
 
@@ -333,33 +217,19 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
                 if (Math.abs(velocity) < 1) {
                     isBouncing = false;
-                    if (!hasCompleted) {
-                        hasCompleted = true;
-                        // アニメーション完了をマーク
-                        if (animationId === 'catA') {
-                            animationCompleteRef.current.catA = true;
-                        } else if (animationId === 'catB') {
-                            animationCompleteRef.current.catB = true;
-                        }
-                    }
                 }
             }
 
             angle += frequency;
             const swayOffset = Math.sin(angle) * adjustedAmplitude;
 
-            element.style.transform = `translate(${swayOffset}px, ${positionY}px)`;
+            element.style.transform = `translate(${swayOffset + baseOffsetX}px, ${positionY + baseOffsetY}px)`;
 
-            // アニメーション完了していない場合のみ位置更新
-            if (!animationCompleteRef.current.catA || !animationCompleteRef.current.catB) {
-                updatePosition();
-            }
+            // 毎フレームスポットライト位置を更新（高フレームレート）
+            updatePosition();
+
+            animationId = requestAnimationFrame(startAnimation);
         };
-
-        // AnimationManagerに登録
-        if (animationManagerRef.current) {
-            animationManagerRef.current.register(animationId, runAnimation);
-        }
 
         // クリックイベントハンドラ
         const onClick = (event: MouseEvent) => {
@@ -368,103 +238,86 @@ export default function WelcomeJS({ isDarkMode }: Props) {
                 return;
             }
 
-            // デバイス情報を再取得
-            deviceInfo = getDeviceInfo();
-            isMobileOrTabletPortrait = deviceInfo.isMobileOrTabletPortrait;
+            if (animationId !== null) cancelAnimationFrame(animationId);
 
             velocity = 0;
-            positionY = isMobileOrTabletPortrait ? -500 : -1150; // スマホまたはタブレット縦向き表示時は初期位置を調整
+            positionY = isPortrait ? -500 : -1150; // portraitモード時は初期位置を調整
             isBouncing = true;
-            hasCompleted = false;
             angle = 0;
-            // アニメーション完了状態をリセット
-            if (animationId === 'catA') {
-                animationCompleteRef.current.catA = false;
-            } else if (animationId === 'catB') {
-                animationCompleteRef.current.catB = false;
-            }
+
+            animationId = requestAnimationFrame(startAnimation);
         };
 
         // リサイズイベントハンドラ
         const handleResize = () => {
-            const newDeviceInfo = getDeviceInfo();
-            const newIsMobileOrTabletPortrait = newDeviceInfo.isMobileOrTabletPortrait;
+            const newDeviceKey = getDeviceConfigKey();
+            const newIsPortrait = newDeviceKey.includes('portrait');
 
-            // モバイルまたはタブレット縦向き状態が変わった場合のみ再調整
-            if (newIsMobileOrTabletPortrait !== isMobileOrTabletPortrait) {
-                isMobileOrTabletPortrait = newIsMobileOrTabletPortrait;
+            // portrait状態が変わった場合のみ再調整
+            if (newIsPortrait !== isPortrait) {
+                if (animationId !== null) cancelAnimationFrame(animationId);
                 velocity = 0;
-                positionY = newIsMobileOrTabletPortrait ? -500 : -1150;
+                positionY = newIsPortrait ? -500 : -1150;
                 isBouncing = true;
-                hasCompleted = false;
                 angle = 0;
-                // アニメーション完了状態をリセット
-                if (animationId === 'catA') {
-                    animationCompleteRef.current.catA = false;
-                } else if (animationId === 'catB') {
-                    animationCompleteRef.current.catB = false;
-                }
+                animationId = requestAnimationFrame(startAnimation);
             }
         };
 
         window.addEventListener('click', onClick);
         window.addEventListener('resize', handleResize);
+        animationId = requestAnimationFrame(startAnimation);
 
         return () => {
             window.removeEventListener('click', onClick);
             window.removeEventListener('resize', handleResize);
-            if (animationManagerRef.current) {
-                animationManagerRef.current.unregister(animationId);
-            }
+            if (animationId !== null) cancelAnimationFrame(animationId);
         };
-    };
+    }, [updatePosition]);
 
     // キャラクターとボードのアニメーション設定
     useEffect(() => {
-        // DOM要素をキャッシュ
-        cacheElements();
-
-        // クリーンアップ関数を格納する配列
-        const cleanupFunctions: (() => void)[] = [];
-
         const handleResize = () => {
             setWindowSize({
                 width: window.innerWidth,
                 height: window.innerHeight,
             });
-            // DOM要素を再キャッシュ
-            cacheElements();
             // リサイズ時に位置を更新
             updatePosition();
         };
 
-        const { board, catMain, cacLogo, catA, catB } = elementsRef.current;
+        const board = document.querySelector('.cac-board') as HTMLElement | null;
+        const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
+        const cacLogo = document.querySelector('.cac-logoL') as HTMLElement | null;
+        const catA = document.querySelector('.catA') as HTMLElement | null;
+        const catB = document.querySelector('.catB') as HTMLElement | null;
 
-        // デバイス情報を取得（キャッシュ使用）
-        const deviceInfo = getDeviceInfo();
-        const { isMobileOrTabletPortrait } = deviceInfo;
+        const { isMobile, isTablet, isMobileOrTablet } = getDeviceInfo();
+
+        // JSON設定からデバイス固有の設定を取得
+        const deviceKey = getDeviceConfigKey();
+        const config = (catPositionConfig as any)[deviceKey];
+        const isPortrait = deviceKey.includes('portrait');
 
         // キャラクターのアニメーション設定
-        if (catA && catB) {
+        if (catA && catB && config) {
             catA.classList.remove('del');
-            // スマホまたはタブレット縦向き表示時はパラメータを調整
-            let cleanupCatA: (() => void) | undefined;
-            if (isMobileOrTabletPortrait) {
-                cleanupCatA = createAnimation(catA, 30, 5, 0.05, 'catA');
+            if (isPortrait) {
+                // portraitモード: モバイル/タブレット縦向き用パラメータ
+                createAnimation(catA, 60, 5, 0.05, 1.3, 0.7, config.catA.offsetX, config.catA.offsetY);
             } else {
-                cleanupCatA = createAnimation(catA, 50, 7, 0.05, 'catA');
+                // landscapeモードまたはPC: デスクトップ用パラメータ
+                createAnimation(catA, 50, 7, 0.05, 1.3, 0.7, config.catA.offsetX, config.catA.offsetY);
             }
-            if (cleanupCatA) cleanupFunctions.push(cleanupCatA);
 
             catB.classList.remove('del');
-            // スマホまたはタブレット縦向き表示時はパラメータを調整
-            let cleanupCatB: (() => void) | undefined;
-            if (isMobileOrTabletPortrait) {
-                cleanupCatB = createAnimation(catB, 30, 10, 0.01, 'catB');
+            if (isPortrait) {
+                // portraitモード: モバイル/タブレット縦向き用パラメータ
+                createAnimation(catB, 0, 10, 0.01, 1.3, 0.7, config.catB.offsetX, config.catB.offsetY);
             } else {
-                cleanupCatB = createAnimation(catB, 50, 20, 0.01, 'catB');
+                // landscapeモードまたはPC: デスクトップ用パラメータ
+                createAnimation(catB, 50, 20, 0.01, 1.3, 0.7, config.catB.offsetX, config.catB.offsetY);
             }
-            if (cleanupCatB) cleanupFunctions.push(cleanupCatB);
         }
 
         // ボードとメインキャラクターの表示とアニメーション
@@ -474,7 +327,7 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             board.classList.remove('del');
             animateBoard(board);
         }
-
+        
         handleResize();
         window.addEventListener('resize', handleResize);
         window.addEventListener('orientationchange', handleResize);
@@ -484,99 +337,125 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         setTimeout(updatePosition, 100);
 
         return () => {
-            // すべてのクリーンアップ関数を実行
-            cleanupFunctions.forEach(cleanup => cleanup());
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('orientationchange', handleResize);
             window.removeEventListener('load', updatePosition);
         };
-    }, [cacheElements, updatePosition]);
+    }, [createAnimation, animateBoard, updatePosition]);
 
     // スポットライトエフェクト
     useEffect(() => {
-        let spotlights: SpotlightPosition[] = [];
         let mouseSpot: SpotlightPosition = {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2,
             r: 0
         };
-        let drawFrameId: number | null = null;
+        let lastMousePosition = { x: 0, y: 0 };
+        let isAnimating = false;
+        let touchStartPos = { x: 0, y: 0 };
+        let animationFrameId: number | null = null;
         let initialized = false;
         const canvas = document.getElementById('spotlightCanvas') as HTMLCanvasElement | null;
         const ctx = canvas?.getContext('2d');
 
-        // will-changeの動的管理
-        const setWillChange = (enable: boolean) => {
-            if (canvas) {
-                canvas.style.willChange = enable ? 'transform' : 'auto';
+        const { isMobileOrTablet } = getDeviceInfo();
+
+        // マウス移動時のハンドラ（PC用 - 高フレームレート）
+        const onMouseMove = (e: MouseEvent) => {
+            if (!isDarkMode) return;
+
+            // 移動距離が閾値（2px）以上の場合のみ更新
+            const dx = e.clientX - lastMousePosition.x;
+            const dy = e.clientY - lastMousePosition.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 2) return;
+
+            lastMousePosition = { x: e.clientX, y: e.clientY };
+            mouseSpot = { x: e.clientX, y: e.clientY, r: window.innerHeight / 2 };
+            spotlightsRef.current[0] = mouseSpot;
+
+            if (isAnimating) return;
+            isAnimating = true;
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(() => {
+                drawSpotlights(spotlightsRef.current);
+                isAnimating = false;
+            });
+        };
+
+        // タッチ開始時のハンドラ（モバイル/タブレット用）
+        const onTouchStart = (e: TouchEvent) => {
+            if (!isDarkMode) return;
+            touchStartPos = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+        };
+
+        // タッチ終了時のハンドラ（モバイル/タブレット用 - オーバーレイトグル）
+        const onTouchEnd = (e: TouchEvent) => {
+            if (!isDarkMode) return;
+
+            const touchEndPos = {
+                x: e.changedTouches[0].clientX,
+                y: e.changedTouches[0].clientY
+            };
+
+            // 移動距離が10px以内ならタップとみなす
+            const dx = touchEndPos.x - touchStartPos.x;
+            const dy = touchEndPos.y - touchStartPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= 10) {
+                // welcomeエリア内のタップの場合、オーバーレイ表示をトグル
+                const welcome = document.querySelector('.welcome');
+                if (welcome && welcome.contains(e.target as Node)) {
+                    e.preventDefault(); // クリックイベントの発火を防止
+                    setOverlayVisible(prev => !prev);
+                }
             }
         };
 
-        // スポットライト位置の共通更新関数
-        const updateSpotlight = (x: number, y: number) => {
-            if (!isDarkMode) return;
-            mouseSpot = { x, y, r: window.innerHeight / 2 };
-            spotlights[0] = mouseSpot;
+        // タッチ移動時のハンドラ（PC用タッチデバイス対応 - 高フレームレート）
+        const onTouchMove = (e: TouchEvent) => {
+            if (!isDarkMode || isMobileOrTablet) return;
 
-            // 連続描画を防止
-            if (drawFrameId) cancelAnimationFrame(drawFrameId);
-            drawFrameId = requestAnimationFrame(() => {
-                drawSpotlights(spotlights);
-                drawFrameId = null;
+            const touch = e.touches[0];
+            const dx = touch.clientX - lastMousePosition.x;
+            const dy = touch.clientY - lastMousePosition.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 2) return;
+
+            lastMousePosition = { x: touch.clientX, y: touch.clientY };
+            mouseSpot = { x: touch.clientX, y: touch.clientY, r: window.innerHeight / 2 };
+            spotlightsRef.current[0] = mouseSpot;
+
+            if (isAnimating) return;
+            isAnimating = true;
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(() => {
+                drawSpotlights(spotlightsRef.current);
+                isAnimating = false;
             });
+        };
+
+        // リサイズ時のハンドラ
+        const onResize = () => {
+            resizeCanvas();
+            if (isDarkMode) drawSpotlights(spotlightsRef.current);
         };
 
         // イベントリスナーの削除
         const removeListeners = () => {
             window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('touchstart', onTouchStart, TOUCH_EVENT_OPTIONS as AddEventListenerOptions);
-            window.removeEventListener('touchmove', onTouchMove, TOUCH_EVENT_OPTIONS as AddEventListenerOptions);
+            window.removeEventListener('touchstart', onTouchStart);
             window.removeEventListener('touchend', onTouchEnd);
+            window.removeEventListener('touchmove', onTouchMove);
             window.removeEventListener('resize', onResize);
-        };
-
-        // マウス移動時のハンドラ
-        const onMouseMove = (e: MouseEvent) => {
-            updateSpotlight(e.clientX, e.clientY);
-        };
-
-        // タッチ開始時のハンドラ
-        const onTouchStart = (e: TouchEvent) => {
-            if (e.touches.length > 0) {
-                const touch = e.touches[0];
-                updateSpotlight(touch.clientX, touch.clientY);
-                setWillChange(true);
-            }
-        };
-
-        // タッチ移動時のハンドラ
-        const onTouchMove = (e: TouchEvent) => {
-            e.preventDefault(); // スクロールを防止
-            if (e.touches.length > 0) {
-                const touch = e.touches[0];
-                updateSpotlight(touch.clientX, touch.clientY);
-            }
-        };
-
-        // タッチ終了時のハンドラ
-        const onTouchEnd = () => {
-            setWillChange(false);
-        };
-
-        // リサイズ時のハンドラ
-        const onResize = () => {
-            // キャッシュをクリア
-            cachedDeviceInfo = null;
-            // DOM要素を再キャッシュ
-            cacheElements();
-            resizeCanvas();
-            if (isDarkMode) {
-                // 位置を再計算してからスポットライトを更新
-                updatePosition();
-                setTimeout(() => {
-                    updateSpotlightPositions();
-                }, 50);
-            }
         };
 
         // キャンバスのリサイズ
@@ -586,12 +465,19 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             canvas.height = window.innerHeight;
         };
 
-        // スポットライトの描画（最適化版）
+        // スポットライトの描画
         const drawSpotlights = (spots: SpotlightPosition[]) => {
             if (!ctx || !canvas) return;
-
-            // 描画開始
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // ライトモードではオーバーレイを描画しない
+            if (!isDarkMode) return;
+
+            // overlayVisibleがfalse（モバイル/タブレットでオフ）の場合はオーバーレイを描画しない
+            if (!overlayVisible) {
+                return;
+            }
+
             ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -610,11 +496,14 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             ctx.globalCompositeOperation = 'source-over';
         };
 
-        // スポットライト位置の更新関数
-        const updateSpotlightPositions = () => {
-            const { spotlightL, spotlightR } = elementsRef.current;
+        // スポットライトの初期化
+        const initializeSpotlight = () => {
+            if (!canvas || !ctx) return;
 
-            if (!spotlightL || !spotlightR) return;
+            const spotLightR = document.querySelector('.spotlightR') as HTMLElement | null;
+            const spotLightL = document.querySelector('.spotlightL') as HTMLElement | null;
+
+            if (!spotLightR || !spotLightL) return;
 
             const getSpotPosition = (element: HTMLElement): SpotlightPosition => {
                 const rect = element.getBoundingClientRect();
@@ -625,49 +514,26 @@ export default function WelcomeJS({ isDarkMode }: Props) {
                 };
             };
 
-            const LRSpot = getSpotPosition(spotlightR);
-            const LLSpot = getSpotPosition(spotlightL);
+            const LRSpot = getSpotPosition(spotLightR);
+            const LLSpot = getSpotPosition(spotLightL);
 
-            spotlights = [mouseSpot, LLSpot, LRSpot];
+            spotlightsRef.current = [mouseSpot, LLSpot, LRSpot];
 
-            if (isDarkMode && ctx && canvas) {
-                drawSpotlights(spotlights);
-            }
-        };
-
-        // コールバックを設定
-        updateSpotlightsCallbackRef.current = updateSpotlightPositions;
-
-        // スポットライトの初期化
-        const initializeSpotlight = () => {
-            if (!canvas || !ctx) return;
-
-            // 要素を再キャッシュして最新の位置を取得
-            cacheElements();
-
-            // 初期位置更新して最新の位置を反映
-            updatePosition();
-
-            // スポットライトの位置を更新
-            setTimeout(() => {
-                updateSpotlightPositions();
-            }, 50);
+            // 描画コールバックを登録
+            updateSpotlightCallbackRef.current = drawSpotlights;
 
             resizeCanvas();
+            drawSpotlights(spotlightsRef.current);
 
-            // デバイス判定（キャッシュ使用）
-            const deviceInfo = getDeviceInfo();
-
-            // タッチデバイスとマウスデバイスの両方に対応
-            if (deviceInfo.isTouchDevice) {
-                // タッチイベントを追加（passive: falseで preventDefault を有効化）
-                window.addEventListener('touchstart', onTouchStart, TOUCH_EVENT_OPTIONS);
-                window.addEventListener('touchmove', onTouchMove, TOUCH_EVENT_OPTIONS);
+            // モバイル/タブレットの場合はタッチ操作、PCの場合はマウス操作を有効化
+            if (isMobileOrTablet) {
+                window.addEventListener('touchstart', onTouchStart);
                 window.addEventListener('touchend', onTouchEnd);
+            } else {
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('touchmove', onTouchMove);
             }
 
-            // マウスイベントは常に追加（タッチデバイスでもマウス接続の可能性があるため）
-            window.addEventListener('mousemove', onMouseMove);
             window.addEventListener('resize', onResize);
 
             initialized = true;
@@ -677,23 +543,21 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         if (isDarkMode && !initialized) {
             initializeSpotlight();
         } else if (!isDarkMode) {
-            removeListeners();
+            // ライトモード時はリソースをクリア
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spotlightsRef.current = [];
+            updateSpotlightCallbackRef.current = null;
             initialized = false;
-            updateSpotlightsCallbackRef.current = null;
-        } else if (isDarkMode && initialized) {
-            // 既に初期化済みでダークモードの場合、スポットライト位置を更新
-            updateSpotlightPositions();
         }
+
+        updatePosition();
 
         return () => {
             removeListeners();
-            if (drawFrameId) cancelAnimationFrame(drawFrameId);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
-            setWillChange(false);
-            updateSpotlightsCallbackRef.current = null;
         };
-    }, [isDarkMode, windowSize, cacheElements, updatePosition]);
+    }, [isDarkMode, windowSize, overlayVisible, updatePosition]);
 
     // 空のフラグメントを返す（実際のレンダリングはwelcome.tsxで行われる）
     return <></>;

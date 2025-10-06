@@ -1,0 +1,92 @@
+{
+  "mobile-portrait": {
+    "catA": {
+      "offsetX": 5,
+      "offsetY": 30
+    },
+    "catB": {
+      "offsetX": 35,
+      "offsetY": -35
+    },
+    "spotlightR": {
+      "offsetTop": -20,
+      "offsetRight": -20
+    },
+    "spotlightL": {
+      "offsetTop": 30,
+      "offsetLeft": 0
+    }
+  },
+  "mobile-landscape": {
+    "catA": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "catB": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "spotlightR": {
+      "offsetTop": -30,
+      "offsetRight": 20
+    },
+    "spotlightL": {
+      "offsetTop": 30,
+      "offsetLeft": 5
+    }
+  },
+  "tablet-portrait": {
+    "catA": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "catB": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "spotlightR": {
+      "offsetTop": -20,
+      "offsetRight": -20
+    },
+    "spotlightL": {
+      "offsetTop": 30,
+      "offsetLeft": -40
+    }
+  },
+  "tablet-landscape": {
+    "catA": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "catB": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "spotlightR": {
+      "offsetTop": -50,
+      "offsetRight": 0
+    },
+    "spotlightL": {
+      "offsetTop": 80,
+      "offsetLeft": 20
+    }
+  },
+  "desktop": {
+    "catA": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "catB": {
+      "offsetX": 0,
+      "offsetY": 0
+    },
+    "spotlightR": {
+      "offsetTop": -50,
+      "offsetRight": 20
+    },
+    "spotlightL": {
+      "offsetTop": 90,
+      "offsetLeft": 20
+    }
+  }
+}
