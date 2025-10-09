@@ -208,7 +208,7 @@ export default function WelcomeJS({ isDarkMode }: Props) {
     });
 
     // オーバーレイ表示状態（モバイル/タブレット用）
-    const [overlayVisible, setOverlayVisible] = useState(true);
+    const [overlayVisible, setOverlayVisible] = useState(false);
 
     // スポットライト配列の参照
     const spotlightsRef = useRef<SpotlightPosition[]>([]);
