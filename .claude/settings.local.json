@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git rm:*)",
+      "Bash(git reset:*)",
+      "Bash(sudo:*)"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": []
+}

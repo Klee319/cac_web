@@ -1,5 +1,6 @@
 import "./welcome.css";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import catPositionConfig from './catPositionConfig.json';
 
 // 型定義
 type Props = {
@@ -12,6 +13,193 @@ interface SpotlightPosition {
     r: number;
 }
 
+// キャラクター設定の型定義
+interface CharacterConfig {
+    offsetX: number;
+    offsetY: number;
+    finalPositionY: number;
+    amplitude?: number;
+    frequency?: number;
+    bounceFactor?: number;
+}
+
+// アニメーションパラメータの型定義
+interface AnimationParams {
+    amplitude: number;
+    frequency: number;
+    bounceFactor: number;
+    finalPositionY: number;
+}
+
+// デバイス別パラメータ範囲定数
+const DEVICE_PARAM_RANGES: Record<string, {
+    minY: number;
+    maxY: number;
+    minAmplitude: number;
+    maxAmplitude: number;
+    minFrequency: number;
+    maxFrequency: number;
+    minBounce: number;
+    maxBounce: number;
+}> = {
+    'mobile-portrait': {
+        minY: 8,
+        maxY: 9,
+        minAmplitude: 2,
+        maxAmplitude: 12,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'mobile-landscape': {
+        minY: 8,
+        maxY: 17,
+        minAmplitude: 3,
+        maxAmplitude: 15,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'tablet-portrait': {
+        minY: 8,
+        maxY: 9,
+        minAmplitude: 2,
+        maxAmplitude: 12,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'tablet-landscape': {
+        minY: 7,
+        maxY: 13,
+        minAmplitude: 8,
+        maxAmplitude: 18,
+        minFrequency: 0.005,
+        maxFrequency: 0.08,
+        minBounce: 0.5,
+        maxBounce: 0.7
+    },
+    'desktop': {
+        minY: 50,
+        maxY: 75,
+        minAmplitude: 8,
+        maxAmplitude: 25,
+        minFrequency: 0.003,
+        maxFrequency: 0.08,
+        minBounce: 0.45,
+        maxBounce: 0.75
+    }
+};
+
+// パラメータ計算関数群
+
+/**
+ * Y座標を0.0〜1.0の範囲に正規化する
+ */
+function normalizePosition(
+    finalPositionY: number,
+    minY: number,
+    maxY: number
+): number {
+    // ゼロ除算を回避（minY === maxYの場合）
+    if (maxY === minY) {
+        return 0.5; // 中間値を返す
+    }
+
+    // 正規化計算
+    const normalized = (finalPositionY - minY) / (maxY - minY);
+
+    // 0.0〜1.0の範囲にクランプ
+    return Math.max(0, Math.min(1, normalized));
+}
+
+/**
+ * 正規化されたY座標に基づいて揺れの振幅を計算する
+ */
+function calculateAmplitude(
+    normalizedY: number,
+    minAmplitude: number,
+    maxAmplitude: number
+): number {
+    return minAmplitude + (maxAmplitude - minAmplitude) * normalizedY;
+}
+
+/**
+ * 正規化されたY座標に基づいて揺れの周波数を計算する
+ */
+function calculateFrequency(
+    normalizedY: number,
+    minFrequency: number,
+    maxFrequency: number
+): number {
+    return maxFrequency - (maxFrequency - minFrequency) * normalizedY;
+}
+
+/**
+ * 正規化されたY座標に基づいてバウンド係数を計算する
+ */
+function calculateBounceFactor(
+    normalizedY: number,
+    minBounce: number,
+    maxBounce: number
+): number {
+    return minBounce + (maxBounce - minBounce) * normalizedY;
+}
+
+/**
+ * アニメーションパラメータを統合的に計算する
+ */
+function getAnimationParams(
+    config: CharacterConfig,
+    deviceKey: string
+): AnimationParams {
+    const finalPositionY = config.finalPositionY;
+
+    // 設定ファイルに明示的にパラメータが存在する場合はそれを使用
+    if (config.amplitude !== undefined &&
+        config.frequency !== undefined &&
+        config.bounceFactor !== undefined) {
+        return {
+            amplitude: config.amplitude,
+            frequency: config.frequency,
+            bounceFactor: config.bounceFactor,
+            finalPositionY: finalPositionY,
+        };
+    }
+
+    // デバイス固有のパラメータ範囲を取得
+    const ranges = DEVICE_PARAM_RANGES[deviceKey] || DEVICE_PARAM_RANGES['desktop'];
+
+    // minY === maxYの場合の特別処理（tablet, desktop等）
+    if (ranges.minY === ranges.maxY) {
+        // 固定値を返す（中間値を使用）
+        return {
+            amplitude: (ranges.minAmplitude + ranges.maxAmplitude) / 2,
+            frequency: (ranges.minFrequency + ranges.maxFrequency) / 2,
+            bounceFactor: (ranges.minBounce + ranges.maxBounce) / 2,
+            finalPositionY: finalPositionY,
+        };
+    }
+
+    // Y座標を正規化
+    const normalizedY = normalizePosition(finalPositionY, ranges.minY, ranges.maxY);
+
+    // 各パラメータを計算
+    const amplitude = calculateAmplitude(normalizedY, ranges.minAmplitude, ranges.maxAmplitude);
+    const frequency = calculateFrequency(normalizedY, ranges.minFrequency, ranges.maxFrequency);
+    const bounceFactor = calculateBounceFactor(normalizedY, ranges.minBounce, ranges.maxBounce);
+
+    return {
+        amplitude,
+        frequency,
+        bounceFactor,
+        finalPositionY,
+    };
+}
+
 export default function WelcomeJS({ isDarkMode }: Props) {
     // ウィンドウサイズの状態管理
     const [windowSize, setWindowSize] = useState({
@@ -19,8 +207,86 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         height: 0,
     });
 
+    // オーバーレイ表示状態（モバイル/タブレット用）
+    const [overlayVisible, setOverlayVisible] = useState(false);
+
+    // スポットライト配列の参照
+    const spotlightsRef = useRef<SpotlightPosition[]>([]);
+    const updateSpotlightCallbackRef = useRef<((spots: SpotlightPosition[]) => void) | null>(null);
+
+    // デバイス判定の共通化関数（タッチデバイス検知）
+    const getDeviceInfo = () => {
+        // タッチデバイスかどうかを判定
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        // スマホサイズかどうか
+        const isMobile = window.innerWidth <= 428;
+
+        // タブレットサイズかどうか（タッチデバイスかつスマホより大きい）
+        const isTablet = isTouchDevice && window.innerWidth > 428 && window.innerWidth <= 1280;
+
+        // タッチデバイス全般（モバイル/タブレット）
+        const isMobileOrTablet = isTouchDevice && window.innerWidth <= 1280;
+
+        return { isTouchDevice, isMobile, isTablet, isMobileOrTablet };
+    };
+
+    // デバイスタイプとオリエンテーションを判定してJSON設定キーを取得
+    const getDeviceConfigKey = () => {
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        // 短辺を基準にデバイス判定
+        const shortSide = Math.min(width, height);
+        const longSide = Math.max(width, height);
+
+        if (shortSide <= 428) {
+            // モバイル: 短辺が428px以下
+            return isPortrait ? 'mobile-portrait' : 'mobile-landscape';
+        } else if (isTouchDevice && longSide <= 1280) {
+            // タブレット: タッチデバイスかつ長辺が1280px以下
+            return isPortrait ? 'tablet-portrait' : 'tablet-landscape';
+        } else {
+            return 'desktop';
+        }
+    };
+
+    // スポットライト位置を更新する関数
+    const updateSpotlightPositions = useCallback(() => {
+        const spotlightL = document.querySelector('.spotlightL') as HTMLElement | null;
+        const spotlightR = document.querySelector('.spotlightR') as HTMLElement | null;
+
+        if (!spotlightL || !spotlightR) return;
+
+        const getSpotPosition = (element: HTMLElement): SpotlightPosition => {
+            const rect = element.getBoundingClientRect();
+            // Canvas描画用はビューポート相対座標なのでscrollは不要
+            return {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+                r: rect.width / 2,
+            };
+        };
+
+        const LLSpot = getSpotPosition(spotlightL);
+        const LRSpot = getSpotPosition(spotlightR);
+
+        // スポットライト配列を更新（インデックス1と2）
+        if (spotlightsRef.current.length >= 3) {
+            spotlightsRef.current[1] = LLSpot;
+            spotlightsRef.current[2] = LRSpot;
+
+            // 描画コールバックが登録されていれば呼び出し
+            if (updateSpotlightCallbackRef.current) {
+                updateSpotlightCallbackRef.current(spotlightsRef.current);
+            }
+        }
+    }, []);
+
     // 要素の位置を更新する関数
-    const updatePosition = () => {
+    const updatePosition = useCallback(() => {
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
         const catA = document.querySelector('.catA') as HTMLElement | null;
@@ -28,39 +294,26 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         const spotlightL = document.querySelector('.spotlightL') as HTMLElement | null;
         const spotlightR = document.querySelector('.spotlightR') as HTMLElement | null;
 
-        // スマホ表示かどうかを判定
-        const isMobile = window.innerWidth <= 428;
-        // タブレット縦向き表示かどうかを判定
-        const isTabletPortrait = window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-        // スマホまたはタブレット縦向き表示かどうかを判定
-        const isMobileOrTabletPortrait = isMobile || isTabletPortrait;
+        const { isMobileOrTablet } = getDeviceInfo();
+
+        // JSON設定からデバイス固有の設定を取得
+        const deviceKey = getDeviceConfigKey();
+        const config = (catPositionConfig as any)[deviceKey];
 
         // キャラクターAとスポットライトRの位置調整
-        if (catA && spotlightR) {
+        if (catA && spotlightR && config) {
             const catARect = catA.getBoundingClientRect();
-            if (isMobileOrTabletPortrait) {
-                // スマホまたはタブレット縦向き表示時の位置調整
-                spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.height * 0.5}px`;
-                spotlightR.style.right = `${window.scrollX}px`;
-            } else {
-                // PC表示時の位置調整
-                spotlightR.style.top = `${window.scrollY + catARect.bottom - catARect.width * 1.3}px`;
-                spotlightR.style.right = `${window.scrollX + catARect.right * 0.01}px`;
-            }
+            const spotlightRConfig = config.spotlightR;
+            spotlightR.style.top = `${catARect.bottom - catARect.height * 0.5 + spotlightRConfig.offsetTop}px`;
+            spotlightR.style.right = `${spotlightRConfig.offsetRight}px`;
         }
 
         // キャラクターBとスポットライトLの位置調整
-        if (catB && spotlightL) {
+        if (catB && spotlightL && config) {
             const catBRect = catB.getBoundingClientRect();
-            if (isMobileOrTabletPortrait) {
-                // スマホまたはタブレット縦向き表示時の位置調整
-                spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.height * 0.5}px`;
-                spotlightL.style.left = `${window.scrollX}px`;
-            } else {
-                // PC表示時の位置調整
-                spotlightL.style.top = `${window.scrollY + catBRect.bottom - catBRect.width * 1.5}px`;
-                spotlightL.style.left = `${window.scrollX + catBRect.left * 0.6}px`;
-            }
+            const spotlightLConfig = config.spotlightL;
+            spotlightL.style.top = `${catBRect.bottom - catBRect.height * 0.5 + spotlightLConfig.offsetTop}px`;
+            spotlightL.style.left = `${spotlightLConfig.offsetLeft}px`;
         }
 
         // メインキャラクターとボードの位置調整
@@ -68,7 +321,7 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
         const rect = catMain.getBoundingClientRect();
         
-        if (isMobileOrTabletPortrait) {
+        if (isMobileOrTablet) {
             // スマホまたはタブレット縦向き表示時の位置調整
             // PC版と同様の相対位置になるように調整
             const handX = window.scrollX + rect.left - rect.width * 0.04;
@@ -76,83 +329,72 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             
             board.style.left = `${handX}px`;
             board.style.top = `${handY}px`;
-            
+
             // transform-originをPC版と同じに設定
             board.style.transformOrigin = 'center bottom';
-            
-            // デバッグ用
-            console.log('Mobile/Tablet position adjustment:', {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                handX,
-                handY,
-                rectLeft: rect.left,
-                rectTop: rect.top
-            });
         } else {
             // PC表示時の位置調整
             const handX = window.scrollX + rect.left - rect.width * 0.04;
             const handY = window.scrollY + rect.top + rect.height * 0.25;
-            
+
             board.style.left = `${handX}px`;
             board.style.top = `${handY}px`;
-            
-            // デバッグ用
-            console.log('PC position adjustment:', {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                handX,
-                handY,
-                rectLeft: rect.left,
-                rectTop: rect.top
-            });
         }
-    };
+
+        // スポットライト位置も更新
+        updateSpotlightPositions();
+    }, [updateSpotlightPositions]);
 
     // ボードのアニメーション
-    const angle = 5;
-    let angleValue = -angle - 35;
-    let direction = 1;
-    
-    const animateBoard = (board: HTMLElement | null) => {
+    const animateBoard = useCallback((board: HTMLElement | null) => {
         if (!board) return;
 
-        angleValue += direction * 0.01;
-        if (angleValue > angle - 35 || angleValue < -angle - 35) {
-            direction *= -1;
-        }
+        const angle = 5;
+        let angleValue = -angle - 35;
+        let direction = 1;
 
-        board.style.transform = `rotate(${angleValue}deg)`;
-        requestAnimationFrame(() => animateBoard(board));
-    };
+        const animate = () => {
+            if (!board) return;
+
+            angleValue += direction * 0.01;
+            if (angleValue > angle - 35 || angleValue < -angle - 35) {
+                direction *= -1;
+            }
+
+            board.style.transform = `rotate(${angleValue}deg)`;
+            requestAnimationFrame(animate);
+        };
+
+        animate();
+    }, []);
 
     // キャラクターのアニメーション作成
-    const createAnimation = (
+    const createAnimation = useCallback((
         element: HTMLElement,
-        finalPositionY: number,
-        amplitude: number,
-        frequency: number,
-        gravity = 1.3,
-        bounceFactor = 0.7
+        characterName: 'catA' | 'catB'  // キャラクター名を受け取る
     ) => {
-        // スマホ表示かどうかを判定
-        const isMobile = window.innerWidth <= 428;
-        
-        // タブレット縦向き表示かどうかを判定
-        const isTabletPortrait = window.innerWidth > 428 && window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-        
-        // iPad Pro縦向き表示かどうかを判定
-        const isIPadProPortrait = window.innerWidth >= 1024 && window.innerWidth <= 1280 && window.innerHeight >= 1180 && window.innerWidth / window.innerHeight < 0.8;
-        
-        // スマホまたはタブレット縦向き表示かどうかを判定
-        const isMobileOrTabletPortrait = isMobile || isTabletPortrait || isIPadProPortrait;
-        
-        // スマホまたはタブレット縦向き表示時はパラメータを調整
-        const adjustedFinalPositionY = isMobileOrTabletPortrait ? finalPositionY / 2 : finalPositionY;
-        const adjustedAmplitude = isMobileOrTabletPortrait ? amplitude / 1.5 : amplitude;
-        
-        // 初期位置をスマホまたはタブレット縦向き表示時は調整
-        let positionY = isMobileOrTabletPortrait ? -500 : -1150;
+        let currentDeviceKey = getDeviceConfigKey();
+        let currentIsPortrait = currentDeviceKey.includes('portrait');
+
+        // 現在のデバイスキーに応じたconfigを取得
+        let currentConfig = (catPositionConfig as any)[currentDeviceKey][characterName];
+
+        // オフセット値を取得
+        let baseOffsetX = currentConfig.offsetX;
+        let baseOffsetY = currentConfig.offsetY;
+
+        // パラメータを計算または設定ファイルから取得（デバイスキーベース）
+        let params = getAnimationParams(currentConfig, currentDeviceKey);
+
+        // portraitモード時のみfinalPositionYとamplitudeを調整
+        let adjustedFinalPositionY = currentIsPortrait ? params.finalPositionY / 2 : params.finalPositionY;
+        let adjustedAmplitude = currentIsPortrait ? params.amplitude / 1.5 : params.amplitude;
+
+        // 重力加速度（マイルドなバウンド演出のため低めに設定）
+        const gravity = 0.8;
+
+        // 初期位置をportraitモード時のみ調整
+        let positionY = currentIsPortrait ? -500 : -1150;
         let velocity = 0;
         let angle = -1;
         let isBouncing = true;
@@ -165,18 +407,21 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
             if (positionY >= adjustedFinalPositionY) {
                 positionY = adjustedFinalPositionY;
-                velocity = -velocity * bounceFactor;
+                velocity = -velocity * params.bounceFactor; // 計算されたバウンド係数を使用
 
                 if (Math.abs(velocity) < 1) {
                     isBouncing = false;
                 }
             }
 
-            angle += frequency;
+            angle += params.frequency; // 計算された周波数を使用
             const swayOffset = Math.sin(angle) * adjustedAmplitude;
 
-            element.style.transform = `translate(${swayOffset}px, ${positionY}px)`;
+            element.style.transform = `translate(${swayOffset + baseOffsetX}px, ${positionY + baseOffsetY}px)`;
+
+            // 毎フレームスポットライト位置を更新（高フレームレート）
             updatePosition();
+
             animationId = requestAnimationFrame(startAnimation);
         };
 
@@ -190,7 +435,7 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             if (animationId !== null) cancelAnimationFrame(animationId);
 
             velocity = 0;
-            positionY = isMobileOrTabletPortrait ? -500 : -1150; // スマホまたはタブレット縦向き表示時は初期位置を調整
+            positionY = currentIsPortrait ? -500 : -1150; // portraitモード時は初期位置を調整
             isBouncing = true;
             angle = 0;
 
@@ -199,17 +444,36 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
         // リサイズイベントハンドラ
         const handleResize = () => {
-            const newIsMobile = window.innerWidth <= 428;
-            const newIsTabletPortrait = window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-            const newIsMobileOrTabletPortrait = newIsMobile || newIsTabletPortrait;
-            
-            // モバイルまたはタブレット縦向き状態が変わった場合のみ再調整
-            if (newIsMobileOrTabletPortrait !== isMobileOrTabletPortrait) {
+            // orientationchange経由でない通常のresizeのみ処理
+            // （orientationchangeは別途ハンドラで処理されるため）
+            const newDeviceKey = getDeviceConfigKey();
+            const newIsPortrait = newDeviceKey.includes('portrait');
+
+            // デバイスキーが変わった場合に再調整
+            if (newDeviceKey !== currentDeviceKey) {
                 if (animationId !== null) cancelAnimationFrame(animationId);
+
+                // 現在のデバイスキーとパラメータを更新
+                currentDeviceKey = newDeviceKey;
+                currentIsPortrait = newIsPortrait;
+
+                // 新しいデバイスキーに応じた新しいconfigを取得
+                currentConfig = (catPositionConfig as any)[newDeviceKey][characterName];
+
+                // オフセット値を更新
+                baseOffsetX = currentConfig.offsetX;
+                baseOffsetY = currentConfig.offsetY;
+
+                params = getAnimationParams(currentConfig, currentDeviceKey);
+                adjustedFinalPositionY = currentIsPortrait ? params.finalPositionY / 2 : params.finalPositionY;
+                adjustedAmplitude = currentIsPortrait ? params.amplitude / 1.5 : params.amplitude;
+
+                // アニメーション状態をリセット
                 velocity = 0;
-                positionY = newIsMobileOrTabletPortrait ? -500 : -1150;
+                positionY = currentIsPortrait ? -500 : -1150;
                 isBouncing = true;
                 angle = 0;
+
                 animationId = requestAnimationFrame(startAnimation);
             }
         };
@@ -223,64 +487,71 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             window.removeEventListener('resize', handleResize);
             if (animationId !== null) cancelAnimationFrame(animationId);
         };
-    };
+    }, [updatePosition]);
 
-    // キャラクターとボードのアニメーション設定
+    // ウィンドウサイズの監視（リサイズ時に位置更新）
     useEffect(() => {
         const handleResize = () => {
             setWindowSize({
                 width: window.innerWidth,
                 height: window.innerHeight,
             });
-            // リサイズ時に位置を更新
             updatePosition();
         };
-        
+
+        // orientationchange時はwindowサイズ更新を待つ
+        const handleOrientationChange = () => {
+            // windowサイズが更新されるまで待機
+            const checkSize = () => {
+                const currentOrientation = window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+                const screenOrientation = screen.orientation?.type.includes('portrait') ? 'portrait' : 'landscape';
+
+                // windowサイズとscreen.orientationが一致するまで待機
+                if (currentOrientation === screenOrientation) {
+                    setWindowSize({
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                    });
+                    updatePosition();
+                } else {
+                    requestAnimationFrame(checkSize);
+                }
+            };
+            requestAnimationFrame(checkSize);
+        };
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleOrientationChange);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('orientationchange', handleOrientationChange);
+        };
+    }, [updatePosition]);
+
+    // キャラクターとボードのアニメーション設定
+    useEffect(() => {
+
         const board = document.querySelector('.cac-board') as HTMLElement | null;
         const catMain = document.querySelector('.cac-cat-main') as HTMLElement | null;
         const cacLogo = document.querySelector('.cac-logoL') as HTMLElement | null;
         const catA = document.querySelector('.catA') as HTMLElement | null;
         const catB = document.querySelector('.catB') as HTMLElement | null;
 
-        // スマホ表示かどうかを判定
-        const isMobile = window.innerWidth <= 428;
-        
-        // タブレット縦向き表示かどうかを判定
-        const isTabletPortrait = window.innerWidth > 428 && window.innerWidth <= 1280 && window.innerHeight >= 768 && window.innerWidth / window.innerHeight < 0.8;
-        
-        // iPad Pro縦向き表示かどうかを判定
-        const isIPadProPortrait = window.innerWidth >= 1024 && window.innerWidth <= 1280 && window.innerHeight >= 1180 && window.innerWidth / window.innerHeight < 0.8;
-        
-        // スマホまたはタブレット縦向き表示かどうかを判定
-        const isMobileOrTabletPortrait = isMobile || isTabletPortrait || isIPadProPortrait;
-        
-        // デバッグ用
-        console.log('Device detection:', {
-            width: window.innerWidth,
-            height: window.innerHeight,
-            isMobile,
-            isTabletPortrait,
-            isIPadProPortrait,
-            isMobileOrTabletPortrait
-        });
+        const { isMobile, isTablet, isMobileOrTablet } = getDeviceInfo();
+
+        // JSON設定からデバイス固有の設定を取得
+        const deviceKey = getDeviceConfigKey();
+        const config = (catPositionConfig as any)[deviceKey];
+        const isPortrait = deviceKey.includes('portrait');
 
         // キャラクターのアニメーション設定
-        if (catA && catB) {
+        if (catA && catB && config) {
             catA.classList.remove('del');
-            // スマホまたはタブレット縦向き表示時はパラメータを調整
-            if (isMobileOrTabletPortrait) {
-                createAnimation(catA, 30, 5, 0.05);
-            } else {
-                createAnimation(catA, 50, 7, 0.05);
-            }
-            
+            createAnimation(catA, 'catA');
+
             catB.classList.remove('del');
-            // スマホまたはタブレット縦向き表示時はパラメータを調整
-            if (isMobileOrTabletPortrait) {
-                createAnimation(catB, 30, 10, 0.01);
-            } else {
-                createAnimation(catB, 50, 20, 0.01);
-            }
+            createAnimation(catB, 'catB');
         }
 
         // ボードとメインキャラクターの表示とアニメーション
@@ -290,62 +561,130 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             board.classList.remove('del');
             animateBoard(board);
         }
-        
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('orientationchange', handleResize);
+
         window.addEventListener('load', updatePosition);
 
         // 初期表示時に位置を更新（少し遅延させて要素のレンダリングを待つ）
         setTimeout(updatePosition, 100);
 
-        // デバッグ用：表示モードをコンソールに出力
-        console.log('isMobile:', isMobile);
-        console.log('isTabletPortrait:', isTabletPortrait);
-        console.log('isMobileOrTabletPortrait:', isMobileOrTabletPortrait);
-        console.log('Window size:', window.innerWidth, 'x', window.innerHeight);
-        console.log('Aspect ratio:', window.innerWidth / window.innerHeight);
-
         return () => {
-            window.removeEventListener('resize', handleResize);
-            window.removeEventListener('orientationchange', handleResize);
             window.removeEventListener('load', updatePosition);
         };
-    }, []);
+    }, [createAnimation, animateBoard, updatePosition]);
 
     // スポットライトエフェクト
     useEffect(() => {
-        let spotlights: SpotlightPosition[] = [];
         let mouseSpot: SpotlightPosition = {
             x: window.innerWidth / 2,
             y: window.innerHeight / 2,
             r: 0
         };
+        let lastMousePosition = { x: 0, y: 0 };
+        let isAnimating = false;
+        let touchStartPos = { x: 0, y: 0 };
         let animationFrameId: number | null = null;
         let initialized = false;
         const canvas = document.getElementById('spotlightCanvas') as HTMLCanvasElement | null;
         const ctx = canvas?.getContext('2d');
 
-        // イベントリスナーの削除
-        const removeListeners = () => {
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('resize', onResize);
-        };
+        const { isMobileOrTablet } = getDeviceInfo();
 
-        // マウス移動時のハンドラ
+        // マウス移動時のハンドラ（PC用 - 高フレームレート）
         const onMouseMove = (e: MouseEvent) => {
             if (!isDarkMode) return;
+
+            // 移動距離が閾値（2px）以上の場合のみ更新
+            const dx = e.clientX - lastMousePosition.x;
+            const dy = e.clientY - lastMousePosition.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 2) return;
+
+            lastMousePosition = { x: e.clientX, y: e.clientY };
             mouseSpot = { x: e.clientX, y: e.clientY, r: window.innerHeight / 2 };
-            spotlights[0] = mouseSpot;
+            spotlightsRef.current[0] = mouseSpot;
+
+            if (isAnimating) return;
+            isAnimating = true;
 
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(() => drawSpotlights(spotlights));
+            animationFrameId = requestAnimationFrame(() => {
+                drawSpotlights(spotlightsRef.current);
+                isAnimating = false;
+            });
+        };
+
+        // タッチ開始時のハンドラ（モバイル/タブレット用）
+        const onTouchStart = (e: TouchEvent) => {
+            if (!isDarkMode) return;
+            touchStartPos = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+        };
+
+        // タッチ終了時のハンドラ（モバイル/タブレット用 - オーバーレイトグル）
+        const onTouchEnd = (e: TouchEvent) => {
+            if (!isDarkMode) return;
+
+            const touchEndPos = {
+                x: e.changedTouches[0].clientX,
+                y: e.changedTouches[0].clientY
+            };
+
+            // 移動距離が10px以内ならタップとみなす
+            const dx = touchEndPos.x - touchStartPos.x;
+            const dy = touchEndPos.y - touchStartPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance <= 10) {
+                // welcomeエリア内のタップの場合、オーバーレイ表示をトグル
+                const welcome = document.querySelector('.welcome');
+                if (welcome && welcome.contains(e.target as Node)) {
+                    e.preventDefault(); // クリックイベントの発火を防止
+                    setOverlayVisible(prev => !prev);
+                }
+            }
+        };
+
+        // タッチ移動時のハンドラ（PC用タッチデバイス対応 - 高フレームレート）
+        const onTouchMove = (e: TouchEvent) => {
+            if (!isDarkMode || isMobileOrTablet) return;
+
+            const touch = e.touches[0];
+            const dx = touch.clientX - lastMousePosition.x;
+            const dy = touch.clientY - lastMousePosition.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 2) return;
+
+            lastMousePosition = { x: touch.clientX, y: touch.clientY };
+            mouseSpot = { x: touch.clientX, y: touch.clientY, r: window.innerHeight / 2 };
+            spotlightsRef.current[0] = mouseSpot;
+
+            if (isAnimating) return;
+            isAnimating = true;
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(() => {
+                drawSpotlights(spotlightsRef.current);
+                isAnimating = false;
+            });
         };
 
         // リサイズ時のハンドラ
         const onResize = () => {
             resizeCanvas();
-            if (isDarkMode) drawSpotlights(spotlights);
+            if (isDarkMode) drawSpotlights(spotlightsRef.current);
+        };
+
+        // イベントリスナーの削除
+        const removeListeners = () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchend', onTouchEnd);
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('resize', onResize);
         };
 
         // キャンバスのリサイズ
@@ -359,6 +698,15 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         const drawSpotlights = (spots: SpotlightPosition[]) => {
             if (!ctx || !canvas) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // ライトモードではオーバーレイを描画しない
+            if (!isDarkMode) return;
+
+            // overlayVisibleがfalse（モバイル/タブレットでオフ）の場合はオーバーレイを描画しない
+            if (!overlayVisible) {
+                return;
+            }
+
             ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -388,9 +736,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
 
             const getSpotPosition = (element: HTMLElement): SpotlightPosition => {
                 const rect = element.getBoundingClientRect();
+                // Canvas描画用はビューポート相対座標なのでscrollは不要
                 return {
-                    x: rect.left + window.scrollX + rect.width / 2,
-                    y: rect.top + window.scrollY + rect.height / 2,
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2,
                     r: rect.width / 2,
                 };
             };
@@ -398,11 +747,23 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             const LRSpot = getSpotPosition(spotLightR);
             const LLSpot = getSpotPosition(spotLightL);
 
-            spotlights = [mouseSpot, LLSpot, LRSpot];
+            spotlightsRef.current = [mouseSpot, LLSpot, LRSpot];
+
+            // 描画コールバックを登録
+            updateSpotlightCallbackRef.current = drawSpotlights;
 
             resizeCanvas();
-            drawSpotlights(spotlights);
-            window.addEventListener('mousemove', onMouseMove);
+            drawSpotlights(spotlightsRef.current);
+
+            // モバイル/タブレットの場合はタッチ操作、PCの場合はマウス操作を有効化
+            if (isMobileOrTablet) {
+                window.addEventListener('touchstart', onTouchStart);
+                window.addEventListener('touchend', onTouchEnd);
+            } else {
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('touchmove', onTouchMove);
+            }
+
             window.addEventListener('resize', onResize);
 
             initialized = true;
@@ -412,8 +773,10 @@ export default function WelcomeJS({ isDarkMode }: Props) {
         if (isDarkMode && !initialized) {
             initializeSpotlight();
         } else if (!isDarkMode) {
-            removeListeners();
+            // ライトモード時はリソースをクリア
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spotlightsRef.current = [];
+            updateSpotlightCallbackRef.current = null;
             initialized = false;
         }
 
@@ -424,7 +787,7 @@ export default function WelcomeJS({ isDarkMode }: Props) {
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
             if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
         };
-    }, [isDarkMode, windowSize]);
+    }, [isDarkMode, windowSize, overlayVisible, updatePosition]);
 
     // 空のフラグメントを返す（実際のレンダリングはwelcome.tsxで行われる）
     return <></>;
